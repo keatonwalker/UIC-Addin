@@ -1,39 +1,51 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Data;
+using ArcGIS.Core.Data;
+using ArcGIS.Desktop.Core;
+using ArcGIS.Desktop.Editing;
+using ArcGIS.Desktop.Framework;
 using ArcGIS.Desktop.Framework.Threading.Tasks;
 using ArcGIS.Desktop.Mapping;
-using ArcGIS.Core.Data;
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
-using System.Collections.ObjectModel;
-using System.Windows.Data;
-using System.ComponentModel.DataAnnotations;
-using ArcGIS.Desktop.Editing;
-using ArcGIS.Desktop.Core;
 
-namespace UIC_Edit_Workflow
+namespace UIC_Edit_Workflow.Models
 {
-    class AuthorizationModel : ValidatableBindableBase, IWorkTaskModel
+    internal class AuthorizationModel : ValidatableBindableBase, IWorkTaskModel
     {
-        private readonly object lockCollection = new object();
-        private static readonly AuthorizationModel instance = new AuthorizationModel();
-        //private UICModel uicModel = null;
-        private bool _isDirty;
+        public const string TableName = "UICAuthorization";
+        public const string IdField = "AuthorizationID";
+        public readonly StandaloneTable Table;
+        private readonly object _lockCollection = new object();
 
-        private AuthorizationModel() : base()
+        //private UICModel uicModel = null;
+
+        public AuthorizationModel(StandaloneTable standaloneTable) : this()
         {
+            if (standaloneTable == null)
+            {
+                FrameworkApplication.AddNotification(new Notification
+                {
+                    Message = $"The {TableName} layer could not be found. Please add it."
+                });
+            }
+
+            Table = standaloneTable;
             //uicModel = UICModel.Instance;
             //uicModel.FacilityChanged = new FacilityChangeDelegate(facChangeHandler);
-            readOnlyAuthIds = new ReadOnlyObservableCollection<string>(_facilityAuthIds);
+        }
+
+        private AuthorizationModel()
+        { 
+            AuthIds = new ReadOnlyObservableCollection<string>(_facilityAuthIds);
             Utils.RunOnUiThread(() =>
             {
-                BindingOperations.EnableCollectionSynchronization(readOnlyAuthIds, lockCollection);
+                BindingOperations.EnableCollectionSynchronization(AuthIds, _lockCollection);
             });
-            _isDirty = false;
-
         }
 
         private string _authId;
@@ -42,98 +54,42 @@ namespace UIC_Edit_Workflow
         private string _startDate;
         private string _expirationDate;
         private string _comments;
-
-        private string _createdOn;
-        private string _modifiedOn;
-        private string _editedBy;
-
-
         private string _selectedAuthId;
 
-
         private readonly ObservableCollection<string> _facilityAuthIds = new ObservableCollection<string>();
-        private readonly ReadOnlyObservableCollection<string> readOnlyAuthIds;
 
-        #region properties
-        public ReadOnlyObservableCollection<string> AuthIds => readOnlyAuthIds;
+        public ReadOnlyObservableCollection<string> AuthIds { get; }
 
         public string SelectedAuthId
         {
-            get
-            {
-                return _selectedAuthId;
-            }
+            get => _selectedAuthId;
 
             set
             {
                 SetProperty(ref _selectedAuthId, value);
                 if (_selectedAuthId != null)
-                    UpdateModel(_selectedAuthId);
-            }
-        }
-        private long _selectedOid;
-        public long SelectedOid
-        {
-            get
-            {
-                return _selectedOid;
-            }
-
-            set
-            {
-                _selectedOid = value;
-            }
-        }
-        private StandaloneTable _storeFeature;
-        public StandaloneTable StoreFeature
-        {
-            get
-            {
-                if (_storeFeature == null)
                 {
-
-                    _storeFeature = QueuedTask.Run(() =>
-                    {
-                        var map = MapView.Active.Map;
-                        var feature = (StandaloneTable)map.FindStandaloneTables("UICAuthorization").First();
-                        return feature as StandaloneTable;
-                    }).Result;
+                    // TODO: create method? this is bad. cannot be awaited
+                    UpdateModel(_selectedAuthId);
                 }
-                return _storeFeature;
             }
         }
 
-        public static AuthorizationModel Instance
-        {
-            get
-            {
-                return instance;
-            }
-        }
+        public long SelectedOid { get; set; }
 
-        #region tablefields
+        private bool _isDirty;
+
         [Required]
         public string AuthId
         {
-            get
-            {
-                return _authId;
-            }
-
-            set
-            {
-                SetProperty(ref _authId, value);
-            }
+            get => _authId;
+            set => SetProperty(ref _authId, value);
         }
 
         [Required]
         public string AuthType
         {
-            get
-            {
-                return _authType;
-            }
-
+            get => _authType;
             set
             {
                 SetProperty(ref _authType, value);
@@ -144,91 +100,61 @@ namespace UIC_Edit_Workflow
         [Required]
         public string SectorType
         {
-            get
-            {
-                return _sectorType;
-            }
-
-            set
-            {
-                SetProperty(ref _sectorType, value);
-            }
+            get => _sectorType;
+            set => SetProperty(ref _sectorType, value);
         }
 
         [Required]
         public string StartDate
         {
-            get
-            {
-                return _startDate;
-            }
-
-            set
-            {
-                SetProperty(ref _startDate, value);
-            }
+            get => _startDate;
+            set => SetProperty(ref _startDate, value);
         }
 
         [Required]
         public string ExpirationDate
         {
-            get
-            {
-                return _expirationDate;
-            }
-
-            set
-            {
-                SetProperty(ref _expirationDate, value);
-            }
+            get => _expirationDate;
+            set => SetProperty(ref _expirationDate, value);
         }
 
         [Required]
         public string Comments
         {
-            get
-            {
-                return _comments;
-            }
-
-            set
-            {
-                SetProperty(ref _comments, value);
-            }
+            get => _comments;
+            set => SetProperty(ref _comments, value);
         }
 
-        #endregion // End tablefields
-        protected override string fieldValueString()
+        protected override string FieldValueString()
         {
-            StringBuilder sb = new StringBuilder();
+            var sb = new StringBuilder();
             sb.Append(Convert.ToString(AuthId));
             sb.Append(Convert.ToString(AuthType));
             sb.Append(Convert.ToString(SectorType));
             sb.Append(Convert.ToString(StartDate));
             sb.Append(Convert.ToString(ExpirationDate));
             sb.Append(Convert.ToString(Comments));
+
             return sb.ToString();
         }
-        #endregion
 
         public async Task AddIdsForFacility(string facilityId)
         {
             await QueuedTask.Run(() =>
             {
                 _facilityAuthIds.Clear();
-                var map = MapView.Active.Map;
-                StandaloneTable uicAuth = (StandaloneTable)map.FindStandaloneTables("UICAuthorization").First();
-                QueryFilter qf = new QueryFilter()
+                var qf = new QueryFilter
                 {
-                    WhereClause = string.Format("Facility_FK = '{0}'", facilityId)
+                    WhereClause = $"Facility_FK = '{facilityId}'"
                 };
-                using (RowCursor cursor = uicAuth.Search(qf))
+
+                using (var cursor = Table.Search(qf))
                 {
                     while (cursor.MoveNext())
                     {
-                        using (Row row = cursor.Current)
+                        using (var row = cursor.Current)
                         {
-                            _facilityAuthIds.Add(Convert.ToString(row["AuthorizationID"]));
+                            _facilityAuthIds.Add(Convert.ToString(row[IdField]));
                         }
                     }
                 }
@@ -239,117 +165,119 @@ namespace UIC_Edit_Workflow
         {
             await QueuedTask.Run(() =>
             {
-
-                if (authId == null || authId == String.Empty)
+                if (string.IsNullOrEmpty(authId))
                 {
-                    this.SelectedOid = -1;
-                    this.AuthId = "";
-                    this.AuthType = "";
-                    this.SectorType = "";
-                    this.StartDate = "";
-                    this.ExpirationDate = "";
-                    this.Comments = "";
+                    SelectedOid = -1;
+                    AuthId = "";
+                    AuthType = "";
+                    SectorType = "";
+                    StartDate = "";
+                    ExpirationDate = "";
+                    Comments = "";
                 }
                 else
                 {
-                    var map = MapView.Active.Map;
-                    StandaloneTable uicAuth = (StandaloneTable)map.FindStandaloneTables("UICAuthorization").First();
-                    QueryFilter qf = new QueryFilter()
+                    var qf = new QueryFilter
                     {
-                        WhereClause = string.Format("AuthorizationID = '{0}'", authId)
+                        WhereClause = $"{IdField} = '{authId}'"
                     };
-                    using (RowCursor cursor = uicAuth.Search(qf))
+
+                    using (var cursor = Table.Search(qf))
                     {
-                        bool hasRow = cursor.MoveNext();
-                        using (Row row = cursor.Current)
+                        var hasRow = cursor.MoveNext();
+                        if (!hasRow)
                         {
-                            this.SelectedOid = Convert.ToInt64(row["OBJECTID"]);
-                            this.AuthId = Convert.ToString(row["AuthorizationID"]);
-                            this.AuthType = Convert.ToString(row["AuthorizationType"]);
-                            this.SectorType = Convert.ToString(row["OwnerSectorType"]);
-                            this.StartDate = Convert.ToString(row["StartDate"]);
-                            this.ExpirationDate = Convert.ToString(row["ExpirationDate"]);
-                            this.Comments = Convert.ToString(row["Comments"]);
+                            return;
+                        }
+                        using (var row = cursor.Current)
+                        {
+                            SelectedOid = Convert.ToInt64(row["OBJECTID"]);
+                            AuthId = Convert.ToString(row["AuthorizationID"]);
+                            AuthType = Convert.ToString(row["AuthorizationType"]);
+                            SectorType = Convert.ToString(row["OwnerSectorType"]);
+                            StartDate = Convert.ToString(row["StartDate"]);
+                            ExpirationDate = Convert.ToString(row["ExpirationDate"]);
+                            Comments = Convert.ToString(row["Comments"]);
                         }
                     }
                 }
             });
-            LoadHash = calculateFieldHash();
+
+            LoadHash = CalculateFieldHash();
         }
 
         public bool IsWellAtributesComplete()
         {
-            return !String.IsNullOrEmpty(this.AuthId) &&
-                   !String.IsNullOrEmpty(this.AuthType) &&
-                   !String.IsNullOrEmpty(this.SectorType) &&
-                   !String.IsNullOrEmpty(this.StartDate) &&
-                   !String.IsNullOrEmpty(this.ExpirationDate) &&
-                   !String.IsNullOrEmpty(this.Comments);
+            return !string.IsNullOrEmpty(AuthId) &&
+                   !string.IsNullOrEmpty(AuthType) &&
+                   !string.IsNullOrEmpty(SectorType) &&
+                   !string.IsNullOrEmpty(StartDate) &&
+                   !string.IsNullOrEmpty(ExpirationDate) &&
+                   !string.IsNullOrEmpty(Comments);
         }
 
         //Events
         public async void ControllingIdChangedHandler(string oldId, string facGuid)
         {
             await AddIdsForFacility(facGuid);
-            if (AuthIds.Count == 0)
-            {
-                //await UpdateUicWell(null);
-                SelectedAuthId = String.Empty;
-            }
-            else
-            {
-                //await UpdateUicWell(WellIds.First());
-                SelectedAuthId = AuthIds.First();
-            }
-
+            SelectedAuthId = AuthIds.FirstOrDefault();
         }
 
         public Task SaveChanges()
         {
-            Task t = QueuedTask.Run(() =>
+            return QueuedTask.Run(() =>
             {
                 //Create list of oids to update
-                var oidSet = new List<long>() { SelectedOid };
+                var oidSet = new List<long>
+                {
+                    SelectedOid
+                };
                 //Create edit operation and update
-                var op = new ArcGIS.Desktop.Editing.EditOperation();
-                op.Name = "Update Feature";
+                var op = new EditOperation
+                {
+                    Name = "Update Feature"
+                };
                 var insp = new ArcGIS.Desktop.Editing.Attributes.Inspector();
-                insp.Load(StoreFeature, oidSet);
+                insp.Load(Table, oidSet);
 
-                insp["AuthorizationID"] = this.AuthId;
-                insp["AuthorizationType"] = this.AuthType;
-                insp["OwnerSectorType"] = this.SectorType;
-                insp["StartDate"] = this.StartDate;
-                insp["ExpirationDate"] = this.ExpirationDate;
-                insp["Comments"] = this.Comments;
+                insp["AuthorizationID"] = AuthId;
+                insp["AuthorizationType"] = AuthType;
+                insp["OwnerSectorType"] = SectorType;
+                insp["StartDate"] = StartDate;
+                insp["ExpirationDate"] = ExpirationDate;
+                insp["Comments"] = Comments;
 
                 op.Modify(insp);
                 op.Execute();
+
                 Project.Current.SaveEditsAsync();
             });
-            return t;
         }
         public async void AddNew(string facilityGuid, string countyFips)
         {
             await QueuedTask.Run(() =>
             {
-                Guid newGuid = Guid.NewGuid();
-                string guidLast7 = newGuid.ToString();
+                var newGuid = Guid.NewGuid();
+                var guidLast7 = newGuid.ToString();
                 guidLast7 = guidLast7.Substring(guidLast7.Length - 7);
 
-                string authId = String.Format("UTU{0}{1}{2}", countyFips.Substring(countyFips.Length - 2), "NO", guidLast7).ToUpper();
+                var authId = $"UTU{countyFips.Substring(countyFips.Length - 2)}NO{guidLast7}".ToUpper();
                 //Create list of oids to update
-                var attributes = new Dictionary<string, object>();
-                attributes.Add("Facility_FK", facilityGuid);
-                attributes.Add("AuthorizationID", authId);
-                attributes.Add("GUID", newGuid);
+                var attributes = new Dictionary<string, object>
+                {
+                    {"Facility_FK", facilityGuid},
+                    {"AuthorizationID", authId},
+                    {"GUID", newGuid}
+                };
 
-                var map = MapView.Active.Map;
-                StandaloneTable uicAuth = (StandaloneTable)map.FindStandaloneTables("UICAuthorization").First();
-                var createFeatures = new EditOperation();
-                createFeatures.Name = "Create Features";
-                createFeatures.Create(uicAuth, attributes);
+                var createFeatures = new EditOperation
+                {
+                    Name = "Create Features"
+                };
+
+                createFeatures.Create(Table, attributes);
                 createFeatures.Execute();
+
                 _facilityAuthIds.Add(authId);
                 SelectedAuthId = authId;
             });

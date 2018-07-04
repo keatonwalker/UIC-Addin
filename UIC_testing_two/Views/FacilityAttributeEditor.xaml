@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"   
              xmlns:ui="clr-namespace:UIC_Edit_Workflow"
              xmlns:extensions="clr-namespace:ArcGIS.Desktop.Extensions;assembly=ArcGIS.Desktop.Extensions"
+             xmlns:models="clr-namespace:UIC_Edit_Workflow.Models"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300"
              d:DataContext="{Binding Path=ui.FacilityAttributeEditorViewModel}">
@@ -71,14 +72,14 @@
                    Text="CountyFIPS"/>
         <TextBox Grid.Row="1" Grid.Column="1" 
                  Height="20" HorizontalAlignment="Stretch" Margin="5" 
-                 Text="{Binding Source={x:Static ui:FacilityModel.Instance}, Path=CountyFips,
+                 Text="{Binding Source={x:Static ui:Module1.FacilityModel}, Path=CountyFips,
             ValidatesOnDataErrors=True}"/>
         <TextBlock Grid.Row="2" 
                    HorizontalAlignment="Right" Margin="5" 
                    Text="NaicsPrimary"/>
             <TextBox Grid.Row="2" Grid.Column="1" 
                  Height="20" HorizontalAlignment="Stretch" Margin="5" 
-                 Text="{Binding Source={x:Static ui:FacilityModel.Instance}, Path=NaicsPrimary,
+                 Text="{Binding Source={x:Static ui:Module1.FacilityModel}, Path=NaicsPrimary,
              ValidatesOnDataErrors=True}"/>
             <!--Visibility="{Binding Source={x:Static ui:FacilityModel.Instance}, Path=EditReady, Converter={StaticResource boolToVis}}"/>-->
         <TextBlock Grid.Row="3" 
@@ -86,49 +87,49 @@
                    Text="FacilityName"/>
         <TextBox Grid.Row="3" Grid.Column="1" 
                  Height="20" HorizontalAlignment="Stretch" Margin="5" 
-                 Text="{Binding Source={x:Static ui:FacilityModel.Instance}, Path=FacilityName,
+                 Text="{Binding Source={x:Static ui:Module1.FacilityModel}, Path=FacilityName,
             ValidatesOnDataErrors=True}"/>
         <TextBlock Grid.Row="4" 
                    HorizontalAlignment="Right" Margin="5" 
                    Text="FacilityAddress"/>
         <TextBox Grid.Row="4" Grid.Column="1" 
                  Height="20" HorizontalAlignment="Stretch" Margin="5" 
-                 Text="{Binding Source={x:Static ui:FacilityModel.Instance}, Path=FacilityAddress,
+                 Text="{Binding Source={x:Static ui:Module1.FacilityModel}, Path=FacilityAddress,
             ValidatesOnDataErrors=True}"/>
         <TextBlock Grid.Row="5" 
                    HorizontalAlignment="Right" Margin="5" 
                    Text="FacilityCity"/>
         <TextBox Grid.Row="5" Grid.Column="1" 
                  Height="20" HorizontalAlignment="Stretch" Margin="5" 
-                 Text="{Binding Source={x:Static ui:FacilityModel.Instance}, Path=FacilityCity,
+                 Text="{Binding Source={x:Static ui:Module1.FacilityModel}, Path=FacilityCity,
             ValidatesOnDataErrors=True}"/>
         <TextBlock Grid.Row="6" 
                    HorizontalAlignment="Right" Margin="5" 
                    Text="FacilityState"/>
         <TextBox Grid.Row="6" Grid.Column="1" 
                  Height="20" HorizontalAlignment="Stretch" Margin="5" 
-                 Text="{Binding Source={x:Static ui:FacilityModel.Instance}, Path=FacilityState,
+                 Text="{Binding Source={x:Static ui:Module1.FacilityModel}, Path=FacilityState,
             ValidatesOnDataErrors=True}"/>
         <TextBlock Grid.Row="7" 
                    HorizontalAlignment="Right" Margin="5" 
                    Text="FacilityZip"/>
         <TextBox Grid.Row="7" Grid.Column="1" 
                  Height="20" HorizontalAlignment="Stretch" Margin="5" 
-                 Text="{Binding Source={x:Static ui:FacilityModel.Instance}, Path=FacilityZip,
+                 Text="{Binding Source={x:Static ui:Module1.FacilityModel}, Path=FacilityZip,
             ValidatesOnDataErrors=True}"/>
         <TextBlock Grid.Row="8" 
                    HorizontalAlignment="Right" Margin="5" 
                    Text="FacilityMilepost"/>
         <TextBox Grid.Row="8" Grid.Column="1" 
                  Height="20" HorizontalAlignment="Stretch" Margin="5" 
-                 Text="{Binding Source={x:Static ui:FacilityModel.Instance}, Path=FacilityMilepost,
+                 Text="{Binding Source={x:Static ui:Module1.FacilityModel}, Path=FacilityMilepost,
             ValidatesOnDataErrors=True}"/>
         <TextBlock Grid.Row="9" 
                    HorizontalAlignment="Right" Margin="5" 
                    Text="Comments"/>
             <TextBox Grid.Row="9" Grid.Column="1" 
                  Height="20" HorizontalAlignment="Stretch" Margin="5" 
-                 Text="{Binding Source={x:Static ui:FacilityModel.Instance}, Path=Comments,
+                 Text="{Binding Source={x:Static ui:Module1.FacilityModel}, Path=Comments,
                 ValidatesOnDataErrors=True}"/>
         </Grid >
         <GridSplitter HorizontalAlignment="Stretch"
@@ -168,36 +169,36 @@
                     </TextBlock.ToolTip>
             </TextBlock>
             </DockPanel>
-            <ComboBox Grid.Row="1" Grid.Column="1" SelectedItem="{Binding Source={x:Static ui:FacilityInspectionModel.Instance}, Path=SelectedInspectionId, Mode=TwoWay}" Margin="5"
-                  ItemsSource="{Binding Source={x:Static ui:FacilityInspectionModel.Instance}, Path=InspectionIds, Mode=OneWay}"></ComboBox>
+            <ComboBox Grid.Row="1" Grid.Column="1" SelectedItem="{Binding Source={x:Static ui:Module1.FacilityInspectionModel}, Path=SelectedInspectionId, Mode=TwoWay}" Margin="5"
+                  ItemsSource="{Binding Source={x:Static ui:Module1.FacilityInspectionModel}, Path=InspectionIds, Mode=OneWay}"></ComboBox>
             <Button Grid.Row="1" Content="Add New Inspection" Command="{Binding AddInspectionRecord}"/>
             <TextBlock Grid.Row="2" 
                    HorizontalAlignment="Right" Margin="5" 
                    Text="Inspector"/>
             <TextBox Grid.Row="2" Grid.Column="1" 
                  Height="20" HorizontalAlignment="Stretch" Margin="5" 
-                 Text="{Binding Source={x:Static ui:FacilityInspectionModel.Instance}, Path=Inspector,
+                 Text="{Binding Source={x:Static ui:Module1.FacilityInspectionModel}, Path=Inspector,
             ValidatesOnDataErrors=True}"/>
             <TextBlock Grid.Row="3" 
                    HorizontalAlignment="Right" Margin="5" 
                    Text="Inspection Type"/>
             <TextBox Grid.Row="3" Grid.Column="1" 
                  Height="20" HorizontalAlignment="Stretch" Margin="5" 
-                 Text="{Binding Source={x:Static ui:FacilityInspectionModel.Instance}, Path=InspectionType,
+                 Text="{Binding Source={x:Static ui:Module1.FacilityInspectionModel}, Path=InspectionType,
             ValidatesOnDataErrors=True}"/>
             <TextBlock Grid.Row="4" 
                    HorizontalAlignment="Right" Margin="5"
                    Text="Inspection Date"/>
             <TextBox Grid.Row="4" Grid.Column="1" 
                  Height="20" HorizontalAlignment="Stretch" Margin="5" 
-                 Text="{Binding Source={x:Static ui:FacilityInspectionModel.Instance}, Path=InspectionDate,
+                 Text="{Binding Source={x:Static ui:Module1.FacilityInspectionModel}, Path=InspectionDate,
             ValidatesOnDataErrors=True}"/>
             <TextBlock Grid.Row="5" 
                    HorizontalAlignment="Right" Margin="5" 
                    Text="Comment"/>
             <TextBox Grid.Row="5" Grid.Column="1" 
                  Height="20" HorizontalAlignment="Stretch" Margin="5" 
-                 Text="{Binding Source={x:Static ui:FacilityInspectionModel.Instance}, Path=Comments,
+                 Text="{Binding Source={x:Static ui:Module1.FacilityInspectionModel}, Path=Comments,
             ValidatesOnDataErrors=True}"/>
         </Grid >
     </Grid>

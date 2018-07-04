@@ -1,13 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace UIC_Edit_Workflow
 {
-    sealed public class UicValidations : ValidationAttribute
+    public sealed class UicValidations : ValidationAttribute
     {
         // https://github.com/agrc/uic-etl/blob/master/domain.uic-etl/xml/ContactDetail.cs
         public override bool IsValid(object value)
@@ -16,12 +12,12 @@ namespace UIC_Edit_Workflow
         }
         public override string FormatErrorMessage(string name)
         {
-            return String.Format(System.Globalization.CultureInfo.CurrentCulture,
+            return string.Format(System.Globalization.CultureInfo.CurrentCulture,
               ErrorMessageString, name);
         }
     }
 
-    sealed public class NameTest : ValidationAttribute
+    public sealed class NameTest : ValidationAttribute
     {
         public override bool IsValid(object value)
         {
@@ -29,7 +25,7 @@ namespace UIC_Edit_Workflow
         }
         public override string FormatErrorMessage(string name)
         {
-            return String.Format(System.Globalization.CultureInfo.CurrentCulture,
+            return string.Format(System.Globalization.CultureInfo.CurrentCulture,
               ErrorMessageString, name);
         }
     }

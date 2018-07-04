@@ -11,14 +11,13 @@ using System.Threading.Tasks;
 
 namespace UIC_Edit_Workflow
 {
-    class ValidatableBindableBase : BindableBase, INotifyDataErrorInfo
+    internal class ValidatableBindableBase : BindableBase, INotifyDataErrorInfo
     {
-
         protected ValidatableBindableBase()
         {
-            LoadHash = calculateFieldHash();
+            LoadHash = CalculateFieldHash();
         }
-        private Dictionary<string, List<string>> _errors = new Dictionary<string, List<string>>();
+        private readonly Dictionary<string, List<string>> _errors = new Dictionary<string, List<string>>();
         public event EventHandler<DataErrorsChangedEventArgs> ErrorsChanged;
 
         public IEnumerable GetErrors(string propertyName)
@@ -27,31 +26,25 @@ namespace UIC_Edit_Workflow
             {
                 return _errors[propertyName];
             }
-            else
-            {
-                return null;
-            }
+
+            return null;
         }
 
-        public bool HasErrors
-        {
-            get
-            {
-                return _errors.Count > 0;
-            }
-        }
+        public bool HasErrors => _errors.Count > 0;
 
         protected override void SetProperty<T>(ref T member, T val, [CallerMemberName] string propertyName = null)
         {
             ValidateProperty(propertyName, val);
-            base.SetProperty<T>(ref member, val, propertyName);
+            base.SetProperty(ref member, val, propertyName);
         }
 
         private void ValidateProperty<T>(string propertyName, T value)
         {
             var results = new List<ValidationResult>();
-            ValidationContext context = new ValidationContext(this);
-            context.MemberName = propertyName;
+            var context = new ValidationContext(this)
+            {
+                MemberName = propertyName
+            };
             Validator.TryValidateProperty(value, context, results);
 
             if (results.Any())
@@ -62,48 +55,32 @@ namespace UIC_Edit_Workflow
             {
                 _errors.Remove(propertyName);
             }
-            ErrorsChanged(this, new DataErrorsChangedEventArgs(propertyName));
+
+            ErrorsChanged?.Invoke(this, new DataErrorsChangedEventArgs(propertyName));
         }
 
-        private string _loadHash;
-        public string LoadHash
-        {
-            get
-            {
-                return _loadHash;
-            }
+        public string LoadHash { get; set; }
 
-            set
-            {
-                _loadHash = value;
-            }
-        }
-
-        protected virtual string fieldValueString()
+        protected virtual string FieldValueString()
         {
             throw new NotImplementedException("not yet implemented");
         }
-        protected string calculateFieldHash()
+
+        protected string CalculateFieldHash()
         {
-            string fieldString = fieldValueString();
+            var fieldString = FieldValueString();
             // step 1, calculate MD5 hash from input
 
-            MD5 md5 = MD5.Create();
-
-            byte[] inputBytes = Encoding.ASCII.GetBytes(fieldString);
-
-            byte[] hash = md5.ComputeHash(inputBytes);
+            var md5 = MD5.Create();
+            var inputBytes = Encoding.ASCII.GetBytes(fieldString);
+            var hash = md5.ComputeHash(inputBytes);
 
             // step 2, convert byte array to hex string
+            var sb = new StringBuilder();
 
-            StringBuilder sb = new StringBuilder();
-
-            for (int i = 0; i < hash.Length; i++)
-
+            foreach (var t in hash)
             {
-
-                sb.Append(hash[i].ToString("X2"));
-
+                sb.Append(t.ToString("X2"));
             }
 
             return sb.ToString();
@@ -111,7 +88,7 @@ namespace UIC_Edit_Workflow
 
         public bool HasModelChanged()
         {
-            return !LoadHash.Equals(calculateFieldHash());
+            return !LoadHash.Equals(CalculateFieldHash());
         }
     }
 }

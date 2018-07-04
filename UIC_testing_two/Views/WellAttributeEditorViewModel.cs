@@ -1,40 +1,31 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Input;
 using ArcGIS.Desktop.Framework;
 using ArcGIS.Desktop.Framework.Contracts;
-using System.Windows.Input;
 using ArcGIS.Desktop.Framework.Threading.Tasks;
 using ArcGIS.Desktop.Mapping;
-using ArcGIS.Core.Data;
 using ArcGIS.Desktop.Mapping.Events;
+using UIC_Edit_Workflow.Models;
 
-namespace UIC_Edit_Workflow
+namespace UIC_Edit_Workflow.Views
 {
     internal class WellAttributeEditorViewModel : DockPane
     {
-        private FacilityModel _facilityModel = FacilityModel.Instance;
-        private WellModel _wellModel = WellModel.Instance;
-        private WellInspectionModel _inspectionModel = WellInspectionModel.Instance;
-        private FeatureLayer _wellLayer = null;
+        private readonly FacilityModel _facilityModel = Module1.FacilityModel;
+        private readonly WellInspectionModel _inspectionModel = Module1.WellInspectionModel;
 
-        private const string _dockPaneID = "UIC_Edit_Workflow_WellAttributeEditor";
+        public const string PaneId = "UIC_Edit_Workflow_WellAttributeEditor";
 
         protected WellAttributeEditorViewModel()
         {
             MapSelectionChangedEvent.Subscribe(OnSelectionChanged);
         }
 
-        private bool _newWellSelected = false;
+        private bool _newWellSelected;
         public bool NewWellSelected
         {
-            get
-            {
-                return _newWellSelected;
-            }
-
+            get => _newWellSelected;
             set
             {
                 SetProperty(ref _newWellSelected, value, () => NewWellSelected);
@@ -44,11 +35,7 @@ namespace UIC_Edit_Workflow
         private string _newWellClass;
         public string NewWellClass
         {
-            get
-            {
-                return _newWellClass;
-            }
-
+            get => _newWellClass;
             set
             {
                 SetProperty(ref _newWellClass, value, () => NewWellClass);
@@ -62,35 +49,31 @@ namespace UIC_Edit_Workflow
             {
                 if (_addSelectedWell == null)
                 {
-                    _addSelectedWell = new RelayCommand(() => AddSelectedWell(), () => { return !String.IsNullOrWhiteSpace(NewWellClass); });
+                    _addSelectedWell = new RelayCommand(AddSelectedWell, () => !string.IsNullOrWhiteSpace(NewWellClass));
                 }
+
                 return _addSelectedWell;
             }
         }
 
         private Task AddSelectedWell()
         {
-            Task t = QueuedTask.Run(() =>
+            return QueuedTask.Run(() =>
             {
-                if (_wellLayer == null)
-                {
-                    _wellLayer = _wellModel.StoreFeature;
-                }
-
                 long selectedId;
-                var currentselection = _wellLayer.GetSelection();
-                using (RowCursor cursor = currentselection.Search())
+                var currentselection = Module1.WellModel.FeatureLayer.GetSelection();
+                using (var cursor = currentselection.Search())
                 {
-                    bool hasrow = cursor.MoveNext();
-                    using (Row row = cursor.Current)
+                    var hasrow = cursor.MoveNext();
+                    using (var row = cursor.Current)
                     {
                         selectedId = Convert.ToInt64(row["OBJECTID"]);
                     }
                 }
-                _wellModel.AddNew(selectedId, _facilityModel.FacilityGuid, _facilityModel.CountyFips);
+
+                Module1.WellModel.AddNew(selectedId, _facilityModel.FacilityGuid, _facilityModel.CountyFips);
                 NewWellSelected = false;
             });
-            return t;
         }
 
 
@@ -98,9 +81,12 @@ namespace UIC_Edit_Workflow
         {
             foreach (var kvp in mse.Selection)
             {
-                if ((kvp.Key as BasicFeatureLayer) == null || kvp.Key.Name != "UICWell")
+                if (!(kvp.Key is BasicFeatureLayer) || kvp.Key.Name != "UICWell")
+                {
                     continue;
-                BasicFeatureLayer selectedLayer = (BasicFeatureLayer)kvp.Key;
+                }
+
+                var selectedLayer = (BasicFeatureLayer)kvp.Key;
                 //Is a feature selected? Is it an unassigned well feature?
                 if (kvp.Value.Count > 0 && await IsUnassignedWell(selectedLayer))
                 {
@@ -118,16 +104,18 @@ namespace UIC_Edit_Workflow
             return QueuedTask.Run(() => {
                 bool noFacilityFk;
                 bool noWellClass;
+
                 var currentSelection = selectedLayer.GetSelection();
-                using (RowCursor cursor = currentSelection.Search())
+                using (var cursor = currentSelection.Search())
                 {
-                    bool hasrow = cursor.MoveNext();
-                    using (Row row = cursor.Current)
+                    var hasrow = cursor.MoveNext();
+                    using (var row = cursor.Current)
                     {
-                        noFacilityFk = String.IsNullOrWhiteSpace(Convert.ToString(row["Facility_FK"]));
-                        noWellClass = String.IsNullOrWhiteSpace(Convert.ToString(row["WellClass"]));
+                        noFacilityFk = string.IsNullOrWhiteSpace(Convert.ToString(row["Facility_FK"]));
+                        noWellClass = string.IsNullOrWhiteSpace(Convert.ToString(row["WellClass"]));
                     }
                 }
+
                 return noFacilityFk && noWellClass;
             });
         }
@@ -137,11 +125,9 @@ namespace UIC_Edit_Workflow
         /// </summary>
         internal static void Show()
         {
-            DockPane pane = FrameworkApplication.DockPaneManager.Find(_dockPaneID);
-            if (pane == null)
-                return;
+            var pane = FrameworkApplication.DockPaneManager.Find(PaneId);
 
-            pane.Activate();
+            pane?.Activate();
         }
 
         /// <summary>
@@ -150,7 +136,7 @@ namespace UIC_Edit_Workflow
         private string _heading = "My DockPane";
         public string Heading
         {
-            get { return _heading; }
+            get => _heading;
             set
             {
                 SetProperty(ref _heading, value, () => Heading);
@@ -164,27 +150,17 @@ namespace UIC_Edit_Workflow
             {
                 if (_addNewInspection == null)
                 {
-                    _addNewInspection = new RelayCommand(() => AddNewInspection(), () => { return true; });
+                    _addNewInspection = new RelayCommand(() => AddNewInspection(), () => true);
                 }
+
                 return _addNewInspection;
             }
         }
         private void AddNewInspection()
         {
-            string wellGuid = _wellModel.WellGuid;
+            var wellGuid = Module1.WellModel.WellGuid;
 
             _inspectionModel.AddNew(wellGuid);
         }
 }
-
-    /// <summary>
-    /// Button implementation to show the DockPane.
-    /// </summary>
-    internal class WellAttributeEditor_ShowButton : Button
-    {
-        protected override void OnClick()
-        {
-            WellAttributeEditorViewModel.Show();
-        }
-    }
 }

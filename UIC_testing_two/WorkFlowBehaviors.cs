@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Interactivity;
 
@@ -15,8 +10,8 @@ namespace UIC_Edit_Workflow
 
         public bool NeedsSave
         {
-            get { return (bool)GetValue(NeedsSaveProperty); }
-            set { SetValue(NeedsSaveProperty, value); }
+            get => (bool)GetValue(NeedsSaveProperty);
+            set => SetValue(NeedsSaveProperty, value);
         }
 
         // Using a DependencyProperty as the backing store for NeedsSave.  This enables animation, styling, binding, etc...
@@ -25,12 +20,17 @@ namespace UIC_Edit_Workflow
 
         private static void OnNeedsSaveChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            var behavior = ((WorkFlowBehaviors)d);
-            bool needsSave = ((bool)e.NewValue);
+            var behavior = (WorkFlowBehaviors)d;
+            var needsSave = (bool)e.NewValue;
+
             if (needsSave)
+            {
                 behavior.AssociatedObject.Visibility = Visibility.Visible;
+            }
             else
+            {
                 behavior.AssociatedObject.Visibility = Visibility.Hidden;
+            }
 
         }
 

@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"   
              xmlns:ui="clr-namespace:UIC_Edit_Workflow"
              xmlns:extensions="clr-namespace:ArcGIS.Desktop.Extensions;assembly=ArcGIS.Desktop.Extensions"
+             xmlns:models="clr-namespace:UIC_Edit_Workflow.Models"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300"
              d:DataContext="{Binding Path=ui.AuthAttributeEditorViewModel}">
@@ -56,44 +57,44 @@
                 </TextBlock.ToolTip>
             </TextBlock>
         </DockPanel>-->
-        <ComboBox Grid.Row="0" Grid.Column="1" SelectedItem="{Binding Source={x:Static ui:AuthorizationModel.Instance}, Path=SelectedAuthId, Mode=TwoWay}" Margin="5"
-                  ItemsSource="{Binding Source={x:Static ui:AuthorizationModel.Instance}, Path=AuthIds, Mode=OneWay}"></ComboBox>
+        <ComboBox Grid.Row="0" Grid.Column="1" SelectedItem="{Binding Source={x:Static ui:Module1.AuthorizationModel}, Path=SelectedAuthId, Mode=TwoWay}" Margin="5"
+                  ItemsSource="{Binding Source={x:Static ui:Module1.AuthorizationModel}, Path=AuthIds, Mode=OneWay}"></ComboBox>
         <Button Grid.Row="0" Content="Add New Inspection" Command="{Binding AddRecord}"/>
         <TextBlock Grid.Row="1" 
                    HorizontalAlignment="Right" Margin="5" 
                    Text="Auth ID"/>
         <TextBox Grid.Row="1" Grid.Column="1" 
                  Height="20" HorizontalAlignment="Stretch" Margin="5" 
-                 Text="{Binding Source={x:Static ui:AuthorizationModel.Instance}, Path=AuthId, ValidatesOnDataErrors=True}"/>
+                 Text="{Binding Source={x:Static ui:Module1.AuthorizationModel}, Path=AuthId, ValidatesOnDataErrors=True}"/>
         <TextBlock Grid.Row="2" 
                    HorizontalAlignment="Right" Margin="5" 
                    Text="Auth Type"/>
         <TextBox Grid.Row="2" Grid.Column="1" 
                  Height="20" HorizontalAlignment="Stretch" Margin="5" 
-                 Text="{Binding Source={x:Static ui:AuthorizationModel.Instance}, Path=AuthType, ValidatesOnDataErrors=True}"/>
+                 Text="{Binding Source={x:Static ui:Module1.AuthorizationModel}, Path=AuthType, ValidatesOnDataErrors=True}"/>
         <TextBlock Grid.Row="3" 
                    HorizontalAlignment="Right" Margin="5"
                    Text="Owner Sector Type"/>
         <TextBox Grid.Row="3" Grid.Column="1" 
                  Height="20" HorizontalAlignment="Stretch" Margin="5" 
-                 Text="{Binding Source={x:Static ui:AuthorizationModel.Instance}, Path=SectorType, ValidatesOnDataErrors=True}"/>
+                 Text="{Binding Source={x:Static ui:Module1.AuthorizationModel}, Path=SectorType, ValidatesOnDataErrors=True}"/>
         <TextBlock Grid.Row="4" 
                    HorizontalAlignment="Right" Margin="5" 
                    Text="Start Date"/>
         <TextBox Grid.Row="4" Grid.Column="1" 
                  Height="20" HorizontalAlignment="Stretch" Margin="5" 
-                 Text="{Binding Source={x:Static ui:AuthorizationModel.Instance}, Path=StartDate, ValidatesOnDataErrors=True}"/>
+                 Text="{Binding Source={x:Static ui:Module1.AuthorizationModel}, Path=StartDate, ValidatesOnDataErrors=True}"/>
         <TextBlock Grid.Row="5" 
                    HorizontalAlignment="Right" Margin="5" 
                    Text="Expiration Date"/>
         <TextBox Grid.Row="5" Grid.Column="1" 
                  Height="20" HorizontalAlignment="Stretch" Margin="5" 
-                 Text="{Binding Source={x:Static ui:AuthorizationModel.Instance}, Path=ExpirationDate, ValidatesOnDataErrors=True}"/>
+                 Text="{Binding Source={x:Static ui:Module1.AuthorizationModel}, Path=ExpirationDate, ValidatesOnDataErrors=True}"/>
         <TextBlock Grid.Row="6" 
                    HorizontalAlignment="Right" Margin="5" 
                    Text="Comments"/>
         <TextBox Grid.Row="6" Grid.Column="1"
                  Height="20" HorizontalAlignment="Stretch" Margin="5" 
-                 Text="{Binding Source={x:Static ui:AuthorizationModel.Instance}, Path=Comments, ValidatesOnDataErrors=True}"/>
+                 Text="{Binding Source={x:Static ui:Module1.AuthorizationModel}, Path=Comments, ValidatesOnDataErrors=True}"/>
     </Grid >
 </UserControl>

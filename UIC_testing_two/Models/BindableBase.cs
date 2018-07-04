@@ -1,33 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
+﻿using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace UIC_Edit_Workflow
 {
-    class BindableBase : INotifyPropertyChanged
+    internal class BindableBase : INotifyPropertyChanged
     {
-        bool _modelDirty;
-        public bool ModelDirty
-        {
-            get
-            {
-                return _modelDirty;
-            }
-
-            set
-            {
-                _modelDirty = value;
-            }
-        }
+        public bool ModelDirty { get; set; }
 
         protected virtual void SetProperty<T>(ref T member, T val,
             [CallerMemberName] string propertyName = null)
         {
-            if (object.Equals(member, val)) return;
+            if (Equals(member, val)) return;
 
             ModelDirty = true;
             member = val;
@@ -38,6 +21,7 @@ namespace UIC_Edit_Workflow
         {
             PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
         }
+
         public event PropertyChangedEventHandler PropertyChanged = delegate {};
     }
 }

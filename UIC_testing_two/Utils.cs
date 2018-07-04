@@ -12,17 +12,13 @@
 //   See the License for the specific language governing permissions and
 //   limitations under the License. 
 
-using ArcGIS.Core.CIM;
 using ArcGIS.Desktop.Core;
 using ArcGIS.Desktop.Framework;
 using ArcGIS.Desktop.Framework.Contracts;
 using ArcGIS.Desktop.Framework.Threading.Tasks;
 using ArcGIS.Desktop.Mapping;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using MessageBox = ArcGIS.Desktop.Framework.Dialogs.MessageBox;
@@ -40,8 +36,10 @@ namespace UIC_Edit_Workflow
             try
             {
                 // if active map is the correct one, we're done
-                if ((MapView.Active != null) && (MapView.Active.Map != null) && (MapView.Active.Map.URI == url))
+                if (MapView.Active != null && MapView.Active.Map != null && MapView.Active.Map.URI == url)
+                {
                     return;
+                }
 
                 // get the map from the project item
                 Map map = null;
@@ -53,16 +51,27 @@ namespace UIC_Edit_Workflow
 
                 // url is not a project item - oops
                 if (map == null)
+                {
                     return;
+                }
 
                 // check the open panes to see if it's open but just needs activating
-                IEnumerable<IMapPane> mapPanes = FrameworkApplication.Panes.OfType<IMapPane>();
+                var mapPanes = FrameworkApplication.Panes.OfType<IMapPane>();
                 foreach (var mapPane in mapPanes)
                 {
-                    if (mapPane.MapView?.Map?.URI == null) continue;
-                    if (mapPane.MapView.Map.URI != url) continue;
+                    if (mapPane.MapView?.Map?.URI == null)
+                    {
+                        continue;
+                    }
+
+                    if (mapPane.MapView.Map.URI != url)
+                    {
+                        continue;
+                    }
+
                     var pane = mapPane as Pane;
                     pane?.Activate();
+
                     return;
                 }
 
@@ -98,9 +107,13 @@ namespace UIC_Edit_Workflow
             try
             {
                 if (IsOnUiThread)
+                {
                     action();
+                }
                 else
+                {
                     Application.Current.Dispatcher.Invoke(action);
+                }
             }
             catch (Exception ex)
             {
@@ -114,6 +127,6 @@ namespace UIC_Edit_Workflow
         /// 
         /// If called from a View model test it always returns true.
         /// </summary>
-        public static bool IsOnUiThread => ArcGIS.Desktop.Framework.FrameworkApplication.TestMode || System.Windows.Application.Current.Dispatcher.CheckAccess();
+        public static bool IsOnUiThread => FrameworkApplication.TestMode || Application.Current.Dispatcher.CheckAccess();
     }
 }

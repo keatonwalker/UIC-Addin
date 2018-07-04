@@ -1,19 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Windows.Input;
 using ArcGIS.Desktop.Framework;
 using ArcGIS.Desktop.Framework.Contracts;
-using System.Windows.Input;
+using UIC_Edit_Workflow.Models;
 
-namespace UIC_Edit_Workflow
+namespace UIC_Edit_Workflow.Views
 {
     internal class AuthAttributeEditorViewModel : DockPane
     {
-        private const string _dockPaneID = "UIC_Edit_Workflow_AuthAttributeEditor";
-        private FacilityModel _facilityModel = FacilityModel.Instance;
-        private AuthorizationModel _authModel = AuthorizationModel.Instance;
+        private const string DockPaneId = "UIC_Edit_Workflow_AuthAttributeEditor";
+        private static readonly FacilityModel FacilityModel = Module1.FacilityModel;
+        private readonly AuthorizationModel _authModel = Module1.AuthorizationModel;
 
         protected AuthAttributeEditorViewModel() { }
 
@@ -22,11 +18,9 @@ namespace UIC_Edit_Workflow
         /// </summary>
         internal static void Show()
         {
-            DockPane pane = FrameworkApplication.DockPaneManager.Find(_dockPaneID);
-            if (pane == null)
-                return;
+            var pane = FrameworkApplication.DockPaneManager.Find(DockPaneId);
 
-            pane.Activate();
+            pane?.Activate();
         }
 
         /// <summary>
@@ -35,7 +29,7 @@ namespace UIC_Edit_Workflow
         private string _heading = "Authorization";
         public string Heading
         {
-            get { return _heading; }
+            get => _heading;
             set
             {
                 SetProperty(ref _heading, value, () => Heading);
@@ -49,28 +43,18 @@ namespace UIC_Edit_Workflow
             {
                 if (_addNewRecord == null)
                 {
-                    _addNewRecord = new RelayCommand(() => AddNewRecord(), () => { return true; });
+                    _addNewRecord = new RelayCommand(() => AddNewRecord(), () => true);
                 }
+
                 return _addNewRecord;
             }
         }
         private void AddNewRecord()
         {
-            string facGuid = _facilityModel.FacilityGuid;
-            string facFips = _facilityModel.CountyFips;
+            var facGuid = FacilityModel.FacilityGuid;
+            var facFips = FacilityModel.CountyFips;
 
             _authModel.AddNew(facGuid, facFips);
-        }
-    }
-
-    /// <summary>
-    /// Button implementation to show the DockPane.
-    /// </summary>
-    internal class AuthAttributeEditor_ShowButton : Button
-    {
-        protected override void OnClick()
-        {
-            AuthAttributeEditorViewModel.Show();
         }
     }
 }

@@ -100,10 +100,12 @@
   <ItemGroup>
     <Compile Include="Models\FaclilityInspectionModel.cs" />
     <Compile Include="Models\WellInspsectionModel.cs" />
+    <Compile Include="Views\AttributeEditor_ShowButton.cs" />
     <Compile Include="Views\AuthAttributeEditor.xaml.cs">
       <DependentUpon>AuthAttributeEditor.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\AuthAttributeEditorViewModel.cs" />
+    <Compile Include="Views\AuthAttributeEditor_ShowButton.cs" />
     <Compile Include="Views\FacilityAttributeEditor.xaml.cs">
       <DependentUpon>FacilityAttributeEditor.xaml</DependentUpon>
     </Compile>
@@ -123,11 +125,14 @@
     </Compile>
     <Compile Include="Views\WellAttributeEditorViewModel.cs" />
     <Compile Include="Models\WellModel.cs" />
+    <Compile Include="Views\WellAttributeEditor_ShowButton.cs" />
     <Compile Include="WorkFlowBehaviors.cs" />
     <Compile Include="WorkFlowPane.xaml.cs">
       <DependentUpon>WorkFlowPane.xaml</DependentUpon>
     </Compile>
     <Compile Include="WorkFlowPaneViewModel.cs" />
+    <Compile Include="WorkFlowPane_ShowButton.cs" />
+    <Compile Include="WorkTask.cs" />
   </ItemGroup>
   <ItemGroup>
     <Page Include="Views\AuthAttributeEditor.xaml">

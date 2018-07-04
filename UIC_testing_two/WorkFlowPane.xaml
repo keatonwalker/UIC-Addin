@@ -1,70 +1,79 @@
 ﻿<UserControl
-             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:extensions="clr-namespace:ArcGIS.Desktop.Extensions;assembly=ArcGIS.Desktop.Extensions"
-             xmlns:ui="clr-namespace:UIC_Edit_Workflow"
-             xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity" xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions" 
-             x:Class="UIC_Edit_Workflow.WorkFlowPaneView"
-             mc:Ignorable="d" 
-             d:DesignHeight="300" d:DesignWidth="300">
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:extensions="clr-namespace:ArcGIS.Desktop.Extensions;assembly=ArcGIS.Desktop.Extensions"
+    xmlns:ui="clr-namespace:UIC_Edit_Workflow"
+    xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+    xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions"
+    x:Class="UIC_Edit_Workflow.WorkFlowPaneView"
+    mc:Ignorable="d"
+    d:DesignHeight="300" d:DesignWidth="300">
     <!--             xmlns:extensions="clr-namespace:ArcGIS.Desktop.Extensions;assembly=ArcGIS.Desktop.Extensions"
     d:DataContext="{Binding Path=ui.WorkFlowPaneViewModel}"-->
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <extensions:DesignOnlyResourceDictionary Source="pack://application:,,,/ArcGIS.Desktop.Framework;component\Themes\Default.xaml"/>
+                <extensions:DesignOnlyResourceDictionary
+                    Source="pack://application:,,,/ArcGIS.Desktop.Framework;component\Themes\Default.xaml" />
             </ResourceDictionary.MergedDictionaries>
             <BooleanToVisibilityConverter x:Key="boolToVis" />
         </ResourceDictionary>
     </UserControl.Resources>
     <i:Interaction.Triggers>
         <i:EventTrigger EventName="Loaded">
-            <ei:CallMethodAction TargetObject="{Binding}" MethodName="ChangeStuff"/>
+            <ei:CallMethodAction TargetObject="{Binding}" MethodName="ChangeStuff" />
         </i:EventTrigger>
     </i:Interaction.Triggers>
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
         <DockPanel Grid.Row="0" LastChildFill="true" KeyboardNavigation.TabNavigation="Local" Height="30">
-            <TextBlock Grid.Column="1" Text="{Binding Heading}" VerticalAlignment="Center" HorizontalAlignment="Center"
-                    FontSize="16" FontWeight="Light">
+            <TextBlock Text="{Binding Heading}" VerticalAlignment="Center" HorizontalAlignment="Center"
+                       FontSize="16" FontWeight="Light">
                 <TextBlock.ToolTip>
                     <WrapPanel Orientation="Vertical" MaxWidth="300">
-                        <TextBlock Text="{Binding Heading}" TextWrapping="Wrap"/>
+                        <TextBlock Text="{Binding Heading}" TextWrapping="Wrap" />
                     </WrapPanel>
                 </TextBlock.ToolTip>
             </TextBlock>
         </DockPanel>
-        <Grid Grid.Row="1" >
+        <Grid Grid.Row="1">
             <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
             </Grid.RowDefinitions>
 
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="auto"/>
-                <ColumnDefinition/>
+                <ColumnDefinition Width="auto" />
+                <ColumnDefinition />
             </Grid.ColumnDefinitions>
             <StackPanel>
-                <StackPanel Orientation="Horizontal" Grid.ColumnSpan="1" Visibility="{Binding EmptyFips, Converter={StaticResource boolToVis}}">
-                    <TextBlock Margin="5" FontWeight="Bold" Foreground="Red"><Run Text="County FIPS:"/></TextBlock>
-                    <TextBox Text="{Binding SelectedFips}" Margin ="5,5,5,10" Width="84" ToolTip="Enter County FIPS"/>
+                <StackPanel Orientation="Horizontal"
+                            Visibility="{Binding EmptyFips, Converter={StaticResource boolToVis}}">
+                    <TextBlock Margin="5" FontWeight="Bold" Foreground="Red">
+                        <Run Text="County FIPS:" />
+                    </TextBlock>
+                    <TextBox Text="{Binding SelectedFips}" Margin="5,5,5,10" Width="84" ToolTip="Enter County FIPS" />
                 </StackPanel>
-                <StackPanel Orientation="Horizontal" Grid.ColumnSpan="1">
-                    <TextBlock Margin="5"><Run Text="Facility ID:"/></TextBlock>
-                    <TextBox Text="{Binding UicSelection, UpdateSourceTrigger=PropertyChanged}" Margin ="5,5,5,10" Width="100"/>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Margin="5">
+                        <Run Text="Facility ID:" />
+                    </TextBlock>
+                    <TextBox Text="{Binding UicSelection, UpdateSourceTrigger=PropertyChanged}" Margin="5,5,5,10"
+                             Width="100" />
                 </StackPanel>
 
-                <StackPanel Orientation="Horizontal" Grid.ColumnSpan="1">
-                    <Button Margin="5" Command="{Binding SaveModels}" ToolTip="Save Changes" Content="Save" Visibility="Hidden">
+                <StackPanel Orientation="Horizontal">
+                    <Button Margin="5" Command="{Binding SaveModels}" ToolTip="Save Changes" Content="Save"
+                            Visibility="Hidden">
                         <i:Interaction.Behaviors>
-                            <ui:WorkFlowBehaviors NeedsSave="{Binding AreModelsDirty}"/>
+                            <ui:WorkFlowBehaviors NeedsSave="{Binding AreModelsDirty}" />
                         </i:Interaction.Behaviors>
                     </Button>
                     <TextBlock Margin="27,5,5,5" Text="{Binding UicSuggestion}" Width="100">
@@ -75,12 +84,13 @@
                 </StackPanel>
             </StackPanel>
             <StackPanel Grid.Column="1">
-                <Button Margin="5" Command="{Binding AssignId}" ToolTip="Create Facility ID" Content="Assign ID"  Visibility="{Binding EmptyFips, Converter={StaticResource boolToVis}}"/>
-                <Button Margin="5" Command="{Binding SelectUicAndZoom}" ToolTip="Select and Zoom" Content="Zoom Facility"/>
-                <Button Margin="5" Command="{Binding GetSelectedFacility}" ToolTip="Use Selected Facility" Content="Use Selection"/>
+                <Button Margin="5" Command="{Binding AssignId}" ToolTip="Create Facility ID" Content="Assign ID"
+                        Visibility="{Binding EmptyFips, Converter={StaticResource boolToVis}}" />
+                <Button Margin="5" Command="{Binding SelectUicAndZoom}" ToolTip="Select and Zoom"
+                        Content="Zoom Facility" />
+                <Button Margin="5" Command="{Binding GetSelectedFacility}" ToolTip="Use Selected Facility"
+                        Content="Use Selection" />
             </StackPanel>
-                
-         
 
             <TreeView ItemsSource="{Binding TableTasks}" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2">
                 <TreeView.ItemContainerStyle>
@@ -96,17 +106,17 @@
                                 <Setter Property="FontWeight" Value="Bold" />
                             </Trigger>
                             <DataTrigger Binding="{Binding Complete}" Value="False">
-                                <Setter Property="Foreground" Value="Red"/>
+                                <Setter Property="Foreground" Value="Red" />
                             </DataTrigger>
                             <DataTrigger Binding="{Binding Complete}" Value="True">
-                                <Setter Property="Foreground" Value="Black"/>
+                                <Setter Property="Foreground" Value="Black" />
                             </DataTrigger>
                         </Style.Triggers>
                     </Style>
                 </TreeView.ItemContainerStyle>
                 <TreeView.ItemTemplate>
                     <HierarchicalDataTemplate DataType="{x:Type ui:WorkTask}" ItemsSource="{Binding Items}">
-                        <TextBlock Text="{Binding Title}"/>
+                        <TextBlock Text="{Binding Title}" />
                     </HierarchicalDataTemplate>
                 </TreeView.ItemTemplate>
             </TreeView>
