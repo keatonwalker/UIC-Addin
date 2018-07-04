@@ -12,8 +12,9 @@ namespace UIC_Edit_Workflow.Views
 {
     internal class WellAttributeEditorViewModel : DockPane
     {
-        private readonly FacilityModel _facilityModel = Module1.FacilityModel;
-        private readonly WellInspectionModel _inspectionModel = Module1.WellInspectionModel;
+        private readonly FacilityModel _facilityModel = Module1.GetFacilityModel();
+        private readonly WellModel _wellModel = Module1.GetWellModel();
+        private readonly WellInspectionModel _inspectionModel = Module1.GetWellInspectionModel();
 
         public const string PaneId = "UIC_Edit_Workflow_WellAttributeEditor";
 
@@ -61,7 +62,7 @@ namespace UIC_Edit_Workflow.Views
             return QueuedTask.Run(() =>
             {
                 long selectedId;
-                var currentselection = Module1.WellModel.FeatureLayer.GetSelection();
+                var currentselection = _wellModel.FeatureLayer.GetSelection();
                 using (var cursor = currentselection.Search())
                 {
                     var hasrow = cursor.MoveNext();
@@ -71,7 +72,7 @@ namespace UIC_Edit_Workflow.Views
                     }
                 }
 
-                Module1.WellModel.AddNew(selectedId, _facilityModel.FacilityGuid, _facilityModel.CountyFips);
+                _wellModel.AddNew(selectedId, _facilityModel.FacilityGuid, _facilityModel.CountyFips);
                 NewWellSelected = false;
             });
         }
@@ -158,7 +159,7 @@ namespace UIC_Edit_Workflow.Views
         }
         private void AddNewInspection()
         {
-            var wellGuid = Module1.WellModel.WellGuid;
+            var wellGuid = _wellModel.WellGuid;
 
             _inspectionModel.AddNew(wellGuid);
         }

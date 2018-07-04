@@ -8,8 +8,8 @@ namespace UIC_Edit_Workflow.Views
     internal class AuthAttributeEditorViewModel : DockPane
     {
         private const string DockPaneId = "UIC_Edit_Workflow_AuthAttributeEditor";
-        private static readonly FacilityModel FacilityModel = Module1.FacilityModel;
-        private readonly AuthorizationModel _authModel = Module1.AuthorizationModel;
+        private static readonly FacilityModel FacilityModel = Module1.GetFacilityModel();
+        public readonly AuthorizationModel _authModel = Module1.GetAuthorizationModel();
 
         protected AuthAttributeEditorViewModel() { }
 

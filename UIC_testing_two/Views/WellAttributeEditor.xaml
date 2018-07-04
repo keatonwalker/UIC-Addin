@@ -62,71 +62,62 @@
                 <TextBox Text="{Binding NewWellClass, UpdateSourceTrigger=PropertyChanged}" Margin ="5,5,5,10" Width="84" ToolTip="Enter County FIPS"/>
             </StackPanel>
 
-            <ComboBox  Grid.Row="1" Grid.Column="1" SelectedItem="{Binding Source={x:Static ui:Module1.WellModel}, Path=SelectedWellId, Mode=TwoWay}" Margin="5"
-                      ItemsSource="{Binding Source={x:Static ui:Module1.WellModel}, Path=WellIds, Mode=OneWay}" ></ComboBox>
+            <ComboBox  Grid.Row="1" Grid.Column="1" SelectedItem="{Binding SelectedWellId, Mode=TwoWay}" Margin="5"
+                      ItemsSource="{Binding WellIds, Mode=OneWay}" ></ComboBox>
             <TextBlock Grid.Row="2" 
                        HorizontalAlignment="Right" Margin="5" 
                        Text="WellId"/>
             <TextBox Grid.Row="2" Grid.Column="1" 
                      Height="20" HorizontalAlignment="Stretch" Margin="5" 
-                     Text="{Binding Source={x:Static ui:Module1.WellModel}, Path=WellId,
-                 ValidatesOnDataErrors=True}"/>
+                     Text="{Binding WellId, ValidatesOnDataErrors=True}"/>
             <TextBlock Grid.Row="3" 
                        HorizontalAlignment="Right" Margin="5" 
                        Text="WellName"/>
             <TextBox Grid.Row="3" Grid.Column="1" 
                      Height="20" HorizontalAlignment="Stretch" Margin="5" 
-                     Text="{Binding Source={x:Static ui:Module1.WellModel}, Path=WellName,
-                ValidatesOnDataErrors=True}"/>
+                     Text="{Binding WellName, ValidatesOnDataErrors=True}"/>
             <TextBlock Grid.Row="4" 
                        HorizontalAlignment="Right" Margin="5" 
                        Text="WellClass"/>
             <TextBox Grid.Row="4" Grid.Column="1" 
                      Height="20" HorizontalAlignment="Stretch" Margin="5" 
-                     Text="{Binding Source={x:Static ui:Module1.WellModel}, Path=WellClass,
-                ValidatesOnDataErrors=True}"/>
+                     Text="{Binding WellClass, ValidatesOnDataErrors=True}"/>
             <TextBlock Grid.Row="5" 
                        HorizontalAlignment="Right" Margin="5" 
                        Text="WellSubClass"/>
             <TextBox Grid.Row="5" Grid.Column="1" 
                      Height="20" HorizontalAlignment="Stretch" Margin="5" 
-                     Text="{Binding Source={x:Static ui:Module1.WellModel}, Path=WellSubClass,
-                ValidatesOnDataErrors=True}"/>
+                     Text="{Binding WellSubClass, ValidatesOnDataErrors=True}"/>
             <TextBlock Grid.Row="6" 
                        HorizontalAlignment="Right" Margin="5" 
                        Text="HighPriority"/>
             <TextBox Grid.Row="6" Grid.Column="1" 
                      Height="20" HorizontalAlignment="Stretch" Margin="5" 
-                     Text="{Binding Source={x:Static ui:Module1.WellModel}, Path=HighPriority,
-                ValidatesOnDataErrors=True}"/>
+                     Text="{Binding HighPriority, ValidatesOnDataErrors=True}"/>
             <TextBlock Grid.Row="7" 
                        HorizontalAlignment="Right" Margin="5" 
                        Text="WellSWPZ"/>
             <TextBox Grid.Row="7" Grid.Column="1" 
                      Height="20" HorizontalAlignment="Stretch" Margin="5" 
-                     Text="{Binding Source={x:Static ui:Module1.WellModel}, Path=WellSwpz,
-                ValidatesOnDataErrors=True}"/>
+                     Text="{Binding WellSwpz, ValidatesOnDataErrors=True}"/>
             <TextBlock Grid.Row="8" 
                        HorizontalAlignment="Right" Margin="5" 
                        Text="LocationMethod"/>
             <TextBox Grid.Row="8" Grid.Column="1" 
                      Height="20" HorizontalAlignment="Stretch" Margin="5" 
-                     Text="{Binding Source={x:Static ui:Module1.WellModel}, Path=LocationMethod,
-                ValidatesOnDataErrors=True}"/>
+                     Text="{Binding LocationMethod, ValidatesOnDataErrors=True}"/>
             <TextBlock Grid.Row="9" 
                        HorizontalAlignment="Right" Margin="5" 
                        Text="LocationAccuracy"/>
             <TextBox Grid.Row="9" Grid.Column="1" 
                      Height="20" HorizontalAlignment="Stretch" Margin="5" 
-                     Text="{Binding Source={x:Static ui:Module1.WellModel}, Path=LocationAccuracy,
-                ValidatesOnDataErrors=True}"/>
+                     Text="{Binding LocationAccuracy, ValidatesOnDataErrors=True}"/>
             <TextBlock Grid.Row="10" 
                        HorizontalAlignment="Right" Margin="5" 
                        Text="Comments"/>
             <TextBox Grid.Row="10" Grid.Column="1" 
                      Height="20" HorizontalAlignment="Stretch" Margin="5" 
-                     Text="{Binding Source={x:Static ui:Module1.WellModel}, Path=Comments,
-                ValidatesOnDataErrors=True}"/>
+                     Text="{Binding Comments, ValidatesOnDataErrors=True}"/>
 
         </Grid>
         <GridSplitter HorizontalAlignment="Stretch"
@@ -166,37 +157,33 @@
                     </TextBlock.ToolTip>
             </TextBlock>
             </DockPanel>
-            <ComboBox Grid.Row="1" Grid.Column="1" SelectedItem="{Binding Source={x:Static ui:Module1.WellInspectionModel}, Path=SelectedInspectionId, Mode=TwoWay}" Margin="5"
-                  ItemsSource="{Binding Source={x:Static ui:Module1.WellInspectionModel}, Path=InspectionIds, Mode=OneWay}"></ComboBox>
+            <ComboBox Grid.Row="1" Grid.Column="1" SelectedItem="{Binding SelectedInspectionId, Mode=TwoWay}" Margin="5"
+                  ItemsSource="{Binding InspectionIds, Mode=OneWay}"></ComboBox>
             <Button Grid.Row="1" Content="Add New Inspection" Command="{Binding AddInspectionRecord}"/>
             <TextBlock Grid.Row="2" 
                    HorizontalAlignment="Right" Margin="5" 
                    Text="Inspector"/>
             <TextBox Grid.Row="2" Grid.Column="1" 
                  Height="20" HorizontalAlignment="Stretch" Margin="5" 
-                 Text="{Binding Source={x:Static ui:Module1.WellInspectionModel}, Path=Inspector,
-            ValidatesOnDataErrors=True}"/>
+                 Text="{Binding Inspector, ValidatesOnDataErrors=True}"/>
             <TextBlock Grid.Row="3" 
                    HorizontalAlignment="Right" Margin="5" 
                    Text="Inspection Type"/>
             <TextBox Grid.Row="3" Grid.Column="1" 
                  Height="20" HorizontalAlignment="Stretch" Margin="5" 
-                 Text="{Binding Source={x:Static ui:Module1.WellInspectionModel}, Path=InspectionType,
-            ValidatesOnDataErrors=True}"/>
+                 Text="{Binding InspectionType, ValidatesOnDataErrors=True}"/>
             <TextBlock Grid.Row="4" 
                    HorizontalAlignment="Right" Margin="5"
                    Text="Inspection Date"/>
             <TextBox Grid.Row="4" Grid.Column="1" 
                  Height="20" HorizontalAlignment="Stretch" Margin="5" 
-                 Text="{Binding Source={x:Static ui:Module1.WellInspectionModel}, Path=InspectionDate,
-            ValidatesOnDataErrors=True}"/>
+                 Text="{Binding InspectionDate, ValidatesOnDataErrors=True}"/>
             <TextBlock Grid.Row="5" 
                    HorizontalAlignment="Right" Margin="5" 
                    Text="Comment"/>
             <TextBox Grid.Row="5" Grid.Column="1" 
                  Height="20" HorizontalAlignment="Stretch" Margin="5" 
-                 Text="{Binding Source={x:Static ui:Module1.WellInspectionModel}, Path=Comments,
-            ValidatesOnDataErrors=True}"/>
+                 Text="{Binding Comments, ValidatesOnDataErrors=True}"/>
         </Grid >        
     </Grid>
 </UserControl>

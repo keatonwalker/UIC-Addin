@@ -27,36 +27,65 @@ namespace UIC_Edit_Workflow
         public static Module1 Current => _this ?? (_this =
                                              (Module1) FrameworkApplication.FindModule("UIC_Edit_Workflow_Module"));
 
-        public static FacilityModel FacilityModel => _facility ?? (_facility = new FacilityModel(FindLayer(FacilityModel.TableName) as FeatureLayer));
-        public static WellModel WellModel => _well ?? (_well = new WellModel(FindLayer(WellModel.TableName) as FeatureLayer));
+        public static MapView ActiveMapView { get; set; }
 
-        public static AuthorizationModel AuthorizationModel => _authorization ??
-                                                               (_authorization = new AuthorizationModel(FindTable(AuthorizationModel.TableName)));
+        public static FacilityModel GetFacilityModel(MapView view=null)
+        {
+            var activeView = MapView.Active ?? view;
+            var featureLayer = FindLayer(FacilityModel.TableName, activeView) as FeatureLayer;
 
-        public static FacilityInspectionModel FacilityInspectionModel => _facilityInspection ??
-                                                                         (_facilityInspection =
-                                                                             new FacilityInspectionModel(FindTable(FacilityInspectionModel.TableName)));
+            return _facility ?? (_facility = new FacilityModel(featureLayer));
+        }
 
-        public static WellInspectionModel WellInspectionModel => _wellInspection ??
-                                                                 (_wellInspection = new WellInspectionModel(FindTable(FacilityInspectionModel.TableName)));
+        public static WellModel GetWellModel(MapView view=null)
+        {
+            var activeView = MapView.Active ?? view;
+            var featureLayer = FindLayer(WellModel.TableName, activeView) as FeatureLayer;
 
-        public static BasicFeatureLayer FindLayer(string layerName)
+            return _well ?? (_well = new WellModel(featureLayer));
+        }
+
+        public static AuthorizationModel GetAuthorizationModel(MapView view=null)
+        {
+            var activeView = MapView.Active ?? view;
+            var standaloneTable = FindTable(AuthorizationModel.TableName, activeView);
+
+            return _authorization ?? (_authorization = new AuthorizationModel(standaloneTable));
+        }
+
+        public static FacilityInspectionModel GetFacilityInspectionModel(MapView view=null)
+        {
+            var activeView = MapView.Active ?? view;
+            var standaloneTable = FindTable(FacilityInspectionModel.TableName, activeView);
+
+            return _facilityInspection ?? (_facilityInspection = new FacilityInspectionModel(standaloneTable));
+        }
+
+        public static WellInspectionModel GetWellInspectionModel(MapView view=null)
+        {
+            var activeView = MapView.Active ?? view;
+            var standaloneTable = FindTable(WellInspectionModel.TableName, activeView);
+
+            return _wellInspection ?? (_wellInspection = new WellInspectionModel(standaloneTable));
+        }
+
+        public static BasicFeatureLayer FindLayer(string layerName, MapView activeView)
         {
             return QueuedTask.Run(() =>
             {
-                var layers = MapView.Active?.Map.GetLayersAsFlattenedList();
+                var layers = activeView.Map.GetLayersAsFlattenedList();
 
-                return (BasicFeatureLayer)layers?.FirstOrDefault(x => string.Equals(SplitLast(x.Name), SplitLast(layerName),
+                return (BasicFeatureLayer)layers.FirstOrDefault(x => string.Equals(SplitLast(x.Name), SplitLast(layerName),
                                                                                    StringComparison.InvariantCultureIgnoreCase));
             }).Result;
         }
 
-        public static StandaloneTable FindTable(string tableName)
+        public static StandaloneTable FindTable(string tableName, MapView activeView)
         {
             return QueuedTask.Run(() =>
             {
-                var tables = MapView.Active?.Map.StandaloneTables;
-                return tables?.FirstOrDefault(x => string.Equals(SplitLast(x.Name), SplitLast(tableName),
+                var tables = activeView.Map.StandaloneTables;
+                return tables.FirstOrDefault(x => string.Equals(SplitLast(x.Name), SplitLast(tableName),
                                                                 StringComparison.InvariantCultureIgnoreCase));
             }).Result;
         }
@@ -81,6 +110,7 @@ namespace UIC_Edit_Workflow
                                                                                    StringComparison.InvariantCultureIgnoreCase));
             });
         }
+
         /// <summary>
         ///     Called by Framework when ArcGIS Pro is closing
         /// </summary>

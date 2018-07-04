@@ -195,28 +195,28 @@ namespace UIC_Edit_Workflow
 
             if (MapView.Active == null)
             {
-                _initializedEvent = DrawCompleteEvent.Subscribe(args => Init());
+                _initializedEvent = MapViewInitializedEvent.Subscribe(args => Init(args.MapView));
             }
             else
             {
-                Init();
+                Init(MapView.Active);
                 _populated = true;
             }
         }
 
-        private void Init()
+        private void Init(MapView view)
         {
             if (_populated)
             {
                 return;
             }
 
-            SelectedLayer = Module1.FindLayer("uicfacility");
-            AuthModel = Module1.AuthorizationModel;
-            FacilityInspectionModel = Module1.FacilityInspectionModel;
-            FacilityModel = Module1.FacilityModel;
-            WellInspectionModel = Module1.WellInspectionModel;
-            WellModel = Module1.WellModel;
+            SelectedLayer = Module1.FindLayer("uicfacility", view);
+            AuthModel = Module1.GetAuthorizationModel(view);
+            FacilityInspectionModel = Module1.GetFacilityInspectionModel(view);
+            FacilityModel = Module1.GetFacilityModel(view);
+            WellInspectionModel = Module1.GetWellInspectionModel(view);
+            WellModel = Module1.GetWellModel(view);
 
             _allModels = new List<BindableBase>();
             var facilityControlledModels = new List<IWorkTaskModel>

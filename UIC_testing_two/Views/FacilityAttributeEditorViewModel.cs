@@ -3,13 +3,13 @@ using ArcGIS.Desktop.Framework;
 using ArcGIS.Desktop.Framework.Contracts;
 using UIC_Edit_Workflow.Models;
 
-namespace UIC_Edit_Workflow
+namespace UIC_Edit_Workflow.Views
 {
     internal class FacilityAttributeEditorViewModel : DockPane
     {
         private const string DockPaneId = "UIC_Edit_Workflow_FacilityAttributeEditor";
-        private readonly FacilityModel _facilityModel = Module1.FacilityModel;
-        private readonly FacilityInspectionModel _inspectionModel = Module1.FacilityInspectionModel;
+        private readonly FacilityModel _facilityModel = Module1.GetFacilityModel();
+        private readonly FacilityInspectionModel _inspectionModel = Module1.GetFacilityInspectionModel();
 
         /// <summary>
         /// Show the DockPane.

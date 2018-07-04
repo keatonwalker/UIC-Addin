@@ -67,6 +67,17 @@ namespace UIC_Edit_Workflow
                         Utils.RunOnUiThread(() =>
                         {
                             var pane = FrameworkApplication.DockPaneManager.Find(ActivePanel);
+
+                            if (pane == null)
+                            {
+                                FrameworkApplication.AddNotification(new Notification
+                                {
+                                    Message = $"{ActivePanel} is null"
+                                });
+
+                                return;
+                            }
+
                             pane.Activate();
                         });
                     });
