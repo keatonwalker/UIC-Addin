@@ -23,14 +23,7 @@ namespace UIC_Edit_Workflow
             var behavior = (WorkFlowBehaviors)d;
             var needsSave = (bool)e.NewValue;
 
-            if (needsSave)
-            {
-                behavior.AssociatedObject.Visibility = Visibility.Visible;
-            }
-            else
-            {
-                behavior.AssociatedObject.Visibility = Visibility.Hidden;
-            }
+            behavior.AssociatedObject.Visibility = needsSave ? Visibility.Visible : Visibility.Hidden;
 
         }
 

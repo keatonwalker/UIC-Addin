@@ -9,7 +9,9 @@
     xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions"
     x:Class="UIC_Edit_Workflow.WorkFlowPaneView"
     mc:Ignorable="d"
-    d:DesignHeight="300" d:DesignWidth="300">
+    d:DesignHeight="300"
+    d:DesignWidth="300"
+    d:DataContext="{Binding Path=.}">
     <!--             xmlns:extensions="clr-namespace:ArcGIS.Desktop.Extensions;assembly=ArcGIS.Desktop.Extensions"
     d:DataContext="{Binding Path=ui.WorkFlowPaneViewModel}"-->
     <UserControl.Resources>
