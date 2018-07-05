@@ -278,7 +278,7 @@ namespace UIC_Edit_Workflow {
             uicTaskRoot.Items.Add(wellWork); // Add task to root task
 
             // Authorization Task
-            var authWork = new WorkTask(WellAttributeEditorViewModel.DockPaneId) {
+            var authWork = new WorkTask(AuthAttributeEditorViewModel.DockPaneId) {
                 Title = "Authorizations"
             };
 

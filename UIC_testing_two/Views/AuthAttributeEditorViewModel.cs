@@ -6,8 +6,6 @@ using UIC_Edit_Workflow.Models;
 namespace UIC_Edit_Workflow.Views {
     internal class AuthAttributeEditorViewModel : DockPane {
         public const string DockPaneId = "AuthAttributeEditorPane";
-//        private static readonly FacilityModel FacilityModel = UicWorkflowModule.GetFacilityModel();
-//        private readonly AuthorizationModel _authModel = UicWorkflowModule.GetAuthorizationModel();
 
         private RelayCommand _addNewRecord;
 
@@ -16,12 +14,19 @@ namespace UIC_Edit_Workflow.Views {
         /// </summary>
         private string _heading = "Authorization";
 
+        private AuthorizationModel _attributeEditorViewModel;
+
         protected AuthAttributeEditorViewModel() {
         }
 
         public string Heading {
             get => _heading;
             set => SetProperty(ref _heading, value, () => Heading);
+        }
+
+        public AuthorizationModel AuthModel {
+            get => _attributeEditorViewModel;
+            set => SetProperty(ref _attributeEditorViewModel, value, () => AuthModel);
         }
 
         public ICommand AddRecord {

@@ -2,7 +2,6 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using ArcGIS.Desktop.Framework;
 using ArcGIS.Desktop.Framework.Threading.Tasks;
-using ArcGIS.Desktop.Mapping;
 using UIC_Edit_Workflow.Views;
 
 namespace UIC_Edit_Workflow
@@ -81,9 +80,15 @@ namespace UIC_Edit_Workflow
                             }
 
                             if (pane is FacilityAttributeEditorViewModel facility) {
-                                if (facility.FacilityModel == null) {
-                                    facility.FacilityModel = UicWorkflowModule.GetFacilityModel();
-                                }
+                                facility.FacilityModel = UicWorkflowModule.GetFacilityModel();
+                            }
+
+                            if (pane is WellAttributeEditorViewModel well) {
+                                well.WellModel = UicWorkflowModule.GetWellModel();
+                            }
+
+                            if (pane is AuthAttributeEditorViewModel auth) {
+                                auth.AuthModel = UicWorkflowModule.GetAuthorizationModel();
                             }
 
                             pane.Activate();

@@ -3,12 +3,10 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:ui="clr-namespace:UIC_Edit_Workflow"
              xmlns:extensions="clr-namespace:ArcGIS.Desktop.Extensions;assembly=ArcGIS.Desktop.Extensions"
-             xmlns:models="clr-namespace:UIC_Edit_Workflow.Models"
              mc:Ignorable="d"
              d:DesignHeight="300" d:DesignWidth="300"
-             d:DataContext="{Binding Path=ui.FacilityAttributeEditorViewModel}">
+             d:DataContext="{Binding FacilityAttributeEditorViewModel}">
   <UserControl.Resources>
     <ResourceDictionary>
       <ResourceDictionary.MergedDictionaries>
@@ -22,8 +20,7 @@
           <Trigger Property="Validation.HasError"
                    Value="true">
             <Setter Property="ToolTip"
-                    Value="{Binding RelativeSource={x:Static RelativeSource.Self},
-                             Path=(Validation.Errors).CurrentItem.ErrorContent}" />
+                    Value="{Binding RelativeSource={RelativeSource Self}, Path=(Validation.Errors)[0].ErrorContent}" />
           </Trigger>
         </Style.Triggers>
       </Style>

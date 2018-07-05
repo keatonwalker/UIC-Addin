@@ -11,6 +11,8 @@ using UIC_Edit_Workflow.Models;
 namespace UIC_Edit_Workflow.Views {
     internal class WellAttributeEditorViewModel : DockPane {
         public const string DockPaneId = "WellAttributeEditorPane";
+
+        public const string TableName = "UICWell";
 //        private readonly FacilityModel _facilityModel = UicWorkflowModule.GetFacilityModel();
 //        private readonly WellInspectionModel _inspectionModel = UicWorkflowModule.GetWellInspectionModel();
 //        private readonly WellModel _wellModel = UicWorkflowModule.GetWellModel();
@@ -27,9 +29,15 @@ namespace UIC_Edit_Workflow.Views {
         private string _newWellClass;
 
         private bool _newWellSelected;
+        private WellModel _wellModel;
 
         protected WellAttributeEditorViewModel() {
             MapSelectionChangedEvent.Subscribe(OnSelectionChanged);
+        }
+
+        public WellModel WellModel {
+            get => _wellModel;
+            set => SetProperty(ref _wellModel, value, () => WellModel);
         }
 
         public bool NewWellSelected {
@@ -85,7 +93,7 @@ namespace UIC_Edit_Workflow.Views {
 
         private async void OnSelectionChanged(MapSelectionChangedEventArgs mse) {
             foreach (var kvp in mse.Selection) {
-                if (!(kvp.Key is BasicFeatureLayer) || kvp.Key.Name != "UICWell") {
+                if (!(kvp.Key is BasicFeatureLayer) || kvp.Key.Name != TableName) {
                     continue;
                 }
 

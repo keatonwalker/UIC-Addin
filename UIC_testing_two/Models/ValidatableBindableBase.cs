@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -7,9 +7,8 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
 using System.Text;
-using System.Threading.Tasks;
 
-namespace UIC_Edit_Workflow
+namespace UIC_Edit_Workflow.Models
 {
     internal class ValidatableBindableBase : BindableBase, INotifyDataErrorInfo
     {

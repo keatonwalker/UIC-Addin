@@ -23,8 +23,6 @@ namespace UIC_Edit_Workflow {
                                                        (UicWorkflowModule)
                                                        FrameworkApplication.FindModule("UicForkflowModule"));
 
-        public static MapView ActiveMapView { get; set; }
-
         public static FacilityModel GetFacilityModel(MapView view = null) {
             var activeView = MapView.Active ?? view;
             var featureLayer = FindLayer(FacilityModel.TableName, activeView) as FeatureLayer;
@@ -68,11 +66,12 @@ namespace UIC_Edit_Workflow {
                                                                                StringComparison.InvariantCultureIgnoreCase));
         }
 
-        public static StandaloneTable FindTable(string tableName, MapView activeView) => QueuedTask.Run(() => {
+        public static StandaloneTable FindTable(string tableName, MapView activeView) {
             var tables = activeView.Map.StandaloneTables;
+
             return tables.FirstOrDefault(x => string.Equals(SplitLast(x.Name), SplitLast(tableName),
                                                             StringComparison.InvariantCultureIgnoreCase));
-        }).Result;
+        }
 
         private static string SplitLast(string x) {
             if (!x.Contains('.')) {

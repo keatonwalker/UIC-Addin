@@ -1,7 +1,6 @@
-﻿using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace UIC_Edit_Workflow
+namespace UIC_Edit_Workflow.Validations
 {
     public sealed class UicValidations : ValidationAttribute
     {
