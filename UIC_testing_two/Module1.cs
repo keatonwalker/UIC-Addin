@@ -1,13 +1,10 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
-using ArcGIS.Core.Events;
 using ArcGIS.Desktop.Framework;
 using ArcGIS.Desktop.Framework.Contracts;
-using ArcGIS.Desktop.Framework.Dialogs;
 using ArcGIS.Desktop.Framework.Threading.Tasks;
 using ArcGIS.Desktop.Mapping;
-using ArcGIS.Desktop.Mapping.Events;
 using UIC_Edit_Workflow.Models;
 
 namespace UIC_Edit_Workflow
@@ -69,26 +66,18 @@ namespace UIC_Edit_Workflow
             return _wellInspection ?? (_wellInspection = new WellInspectionModel(standaloneTable));
         }
 
-        public static BasicFeatureLayer FindLayer(string layerName, MapView activeView)
-        {
-            return QueuedTask.Run(() =>
-            {
-                var layers = activeView.Map.GetLayersAsFlattenedList();
+        public static BasicFeatureLayer FindLayer(string layerName, MapView activeView) => QueuedTask.Run(() => {
+            var layers = activeView.Map.GetLayersAsFlattenedList();
 
-                return (BasicFeatureLayer)layers.FirstOrDefault(x => string.Equals(SplitLast(x.Name), SplitLast(layerName),
-                                                                                   StringComparison.InvariantCultureIgnoreCase));
-            }).Result;
-        }
+            return (BasicFeatureLayer)layers.FirstOrDefault(x => string.Equals(SplitLast(x.Name), SplitLast(layerName),
+                                                                               StringComparison.InvariantCultureIgnoreCase));
+        }).Result;
 
-        public static StandaloneTable FindTable(string tableName, MapView activeView)
-        {
-            return QueuedTask.Run(() =>
-            {
-                var tables = activeView.Map.StandaloneTables;
-                return tables.FirstOrDefault(x => string.Equals(SplitLast(x.Name), SplitLast(tableName),
-                                                                StringComparison.InvariantCultureIgnoreCase));
-            }).Result;
-        }
+        public static StandaloneTable FindTable(string tableName, MapView activeView) => QueuedTask.Run(() => {
+            var tables = activeView.Map.StandaloneTables;
+            return tables.FirstOrDefault(x => string.Equals(SplitLast(x.Name), SplitLast(tableName),
+                                                            StringComparison.InvariantCultureIgnoreCase));
+        }).Result;
 
         private static string SplitLast(string x)
         {
@@ -100,24 +89,21 @@ namespace UIC_Edit_Workflow
             return x.Split('.').Last();
         }
 
-        public static async Task<BasicFeatureLayer> FindLayerAsync(string layerName)
-        {
-           return await QueuedTask.Run(() =>
-            {
-                var layers = MapView.Active?.Map.GetLayersAsFlattenedList();
+        public static async Task<BasicFeatureLayer> FindLayerAsync(string layerName) => await QueuedTask.Run(() => {
+            var layers = MapView.Active?.Map.GetLayersAsFlattenedList();
 
-                return (BasicFeatureLayer)layers?.FirstOrDefault(x => string.Equals(SplitLast(x.Name), SplitLast(layerName),
-                                                                                   StringComparison.InvariantCultureIgnoreCase));
-            });
-        }
+            var specificLayer = (BasicFeatureLayer)layers?.FirstOrDefault(x => string.Equals(SplitLast(x.Name),
+                                                                                             SplitLast(layerName),
+                                                                                             StringComparison
+                                                                                                 .InvariantCultureIgnoreCase));
+
+            return specificLayer;
+        });
 
         /// <summary>
         ///     Called by Framework when ArcGIS Pro is closing
         /// </summary>
         /// <returns>False to prevent Pro from closing, otherwise True</returns>
-        protected override bool CanUnload()
-        {
-            return true;
-        }
+        protected override bool CanUnload() => true;
     }
 }
