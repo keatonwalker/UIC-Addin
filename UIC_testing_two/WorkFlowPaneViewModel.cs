@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -22,10 +22,8 @@ using ArcGIS.Desktop.Mapping.Events;
 using UIC_Edit_Workflow.Models;
 using UIC_Edit_Workflow.Views;
 
-namespace UIC_Edit_Workflow
-{
-    internal class WorkFlowPaneViewModel : DockPane
-    {
+namespace UIC_Edit_Workflow {
+    internal class WorkFlowPaneViewModel : DockPane {
         public const string DockPaneId = "UIC_Edit_Workflow_WorkFlowPane";
 
         private List<BindableBase> _allModels;
@@ -34,8 +32,10 @@ namespace UIC_Edit_Workflow
         private RelayCommand _getSelectionCmd;
 
         private string _heading = "Workflow Progress";
+        private SubscriptionToken _initializedEvent;
         private bool _modelDirty;
         private RelayCommand _newSelectionCmd;
+        private bool _populated;
         private RelayCommand _saveModelsCmd;
         private string _selectedFips;
         private BasicFeatureLayer _selectedLayer;
@@ -47,23 +47,29 @@ namespace UIC_Edit_Workflow
         public FacilityModel FacilityModel;
         public WellInspectionModel WellInspectionModel;
         public WellModel WellModel;
-        private SubscriptionToken _initializedEvent;
-        private bool _populated;
 
-        public bool EmptyFips
-        {
+        public WorkFlowPaneViewModel() {
+            TableTasks = new ObservableCollection<WorkTask>();
+
+            if (MapView.Active == null) {
+                _initializedEvent = MapViewInitializedEvent.Subscribe(args => Init(args.MapView));
+            } else {
+                Init(MapView.Active);
+                _populated = true;
+            }
+        }
+
+        public bool EmptyFips {
             get => _emptyFips;
             set { SetProperty(ref _emptyFips, value, () => EmptyFips); }
         }
 
-        public bool AreModelsDirty
-        {
+        public bool AreModelsDirty {
             get => _modelDirty;
             set { SetProperty(ref _modelDirty, value, () => AreModelsDirty); }
         }
 
-        public string Heading
-        {
+        public string Heading {
             get => _heading;
             set { SetProperty(ref _heading, value, () => Heading); }
         }
@@ -72,33 +78,25 @@ namespace UIC_Edit_Workflow
 
         public long SelectedOid { get; set; }
 
-        public string SelectedFips
-        {
+        public string SelectedFips {
             get => _selectedFips;
 
-            set
-            {
+            set {
                 SetProperty(ref _selectedFips, value, () => SelectedFips);
-                if (_selectedFips.Length == 5 && int.TryParse(_selectedFips, out int fips))
-                {
+                if (_selectedFips.Length == 5 && int.TryParse(_selectedFips, out int fips)) {
                     EmptyFips = false;
                 }
             }
         }
 
-        public string UicSelection
-        {
+        public string UicSelection {
             get => _uicSelection;
-            set
-            {
+            set {
                 SetProperty(ref _uicSelection, value, () => UicSelection);
                 //clear model if not dirty
-                if (_uicSelection.Length > 6 && _uicSelection.Length < 14)
-                {
+                if (_uicSelection.Length > 6 && _uicSelection.Length < 14) {
                     CheckForSugestion(value);
-                }
-                else if (_uicSelection.Length == 14)
-                {
+                } else if (_uicSelection.Length == 14) {
                     UicSuggestion = null;
                     Debug.WriteLine("Work flow selection id set");
                     UpdateModel(value);
@@ -107,24 +105,19 @@ namespace UIC_Edit_Workflow
             }
         }
 
-        public string UicSuggestion
-        {
+        public string UicSuggestion {
             get => _uicSuggestion;
             set { SetProperty(ref _uicSuggestion, value, () => UicSuggestion); }
         }
 
-        public BasicFeatureLayer SelectedLayer
-        {
+        public BasicFeatureLayer SelectedLayer {
             get => _selectedLayer;
             set { SetProperty(ref _selectedLayer, value, () => SelectedLayer); }
         }
 
-        public ICommand UseFacilitySuggestion
-        {
-            get
-            {
-                if (_useFacilitySuggestion == null)
-                {
+        public ICommand UseFacilitySuggestion {
+            get {
+                if (_useFacilitySuggestion == null) {
                     _useFacilitySuggestion = new RelayCommand(() => { UicSelection = UicSuggestion; },
                                                               () => !string.IsNullOrEmpty(UicSuggestion));
                 }
@@ -133,12 +126,9 @@ namespace UIC_Edit_Workflow
             }
         }
 
-        public ICommand AssignId
-        {
-            get
-            {
-                if (_assignIdCmd == null)
-                {
+        public ICommand AssignId {
+            get {
+                if (_assignIdCmd == null) {
                     _assignIdCmd = new RelayCommand(AssignFacilityId, () => MapView.Active != null);
                 }
 
@@ -146,12 +136,9 @@ namespace UIC_Edit_Workflow
             }
         }
 
-        public ICommand GetSelectedFacility
-        {
-            get
-            {
-                if (_getSelectionCmd == null)
-                {
+        public ICommand GetSelectedFacility {
+            get {
+                if (_getSelectionCmd == null) {
                     _getSelectionCmd = new RelayCommand(GetSelectedFeature, () => MapView.Active != null);
                 }
 
@@ -159,12 +146,9 @@ namespace UIC_Edit_Workflow
             }
         }
 
-        public ICommand SelectUicAndZoom
-        {
-            get
-            {
-                if (_newSelectionCmd == null)
-                {
+        public ICommand SelectUicAndZoom {
+            get {
+                if (_newSelectionCmd == null) {
                     _newSelectionCmd = new RelayCommand(() => ModifyLayerSelection(SelectionCombinationMethod.New),
                                                         () => MapView.Active != null && SelectedLayer != null &&
                                                               !string.IsNullOrEmpty(UicSelection));
@@ -174,12 +158,9 @@ namespace UIC_Edit_Workflow
             }
         }
 
-        public ICommand SaveModels
-        {
-            get
-            {
-                if (_saveModelsCmd == null)
-                {
+        public ICommand SaveModels {
+            get {
+                if (_saveModelsCmd == null) {
                     _saveModelsCmd = new RelayCommand(() => SaveDirtyModels(), () => true);
                 }
 
@@ -187,25 +168,8 @@ namespace UIC_Edit_Workflow
             }
         }
 
-        public WorkFlowPaneViewModel()
-        {
-            TableTasks = new ObservableCollection<WorkTask>();
-
-            if (MapView.Active == null)
-            {
-                _initializedEvent = MapViewInitializedEvent.Subscribe(args => Init(args.MapView));
-            }
-            else
-            {
-                Init(MapView.Active);
-                _populated = true;
-            }
-        }
-
-        private void Init(MapView view)
-        {
-            if (_populated)
-            {
+        private void Init(MapView view) {
+            if (_populated) {
                 return;
             }
 
@@ -217,15 +181,13 @@ namespace UIC_Edit_Workflow
             WellModel = Module1.GetWellModel(view);
 
             _allModels = new List<BindableBase>();
-            var facilityControlledModels = new List<IWorkTaskModel>
-            {
+            var facilityControlledModels = new List<IWorkTaskModel> {
                 WellModel,
                 AuthModel,
                 FacilityInspectionModel
             };
 
-            foreach (var model in facilityControlledModels)
-            {
+            foreach (var model in facilityControlledModels) {
                 FacilityModel.FacilityChanged += model.ControllingIdChangedHandler;
 
                 var propertyModel = (INotifyPropertyChanged)model;
@@ -234,13 +196,11 @@ namespace UIC_Edit_Workflow
                 _allModels.Add((BindableBase)model);
             }
 
-            var wellControlledModels = new List<IWorkTaskModel>
-            {
+            var wellControlledModels = new List<IWorkTaskModel> {
                 WellInspectionModel
             };
 
-            foreach (var model in wellControlledModels)
-            {
+            foreach (var model in wellControlledModels) {
                 WellModel.WellChanged += model.ControllingIdChangedHandler;
 
                 var propertyModel = (INotifyPropertyChanged)model;
@@ -248,42 +208,41 @@ namespace UIC_Edit_Workflow
 
                 _allModels.Add((BindableBase)model);
             }
+
             FacilityModel.PropertyChanged += CheckTaskItemsOnChange;
             _allModels.Add(FacilityModel);
 
             const string editingPaneId = "esri_editing_AttributesDockPane";
             const string createFeaturePaneId = "esri_editing_CreateFeaturesDockPane";
 
-            var uicTaskRoot = new WorkTask(editingPaneId)
-            {
+            var uicTaskRoot = new WorkTask(editingPaneId) {
                 Title = "UIC Facility Workflow"
             };
 
             // Facility Task
-            var facilityWork = new WorkTask(FacilityAttributeEditorViewModel.DockPaneId)
-            {
+            var facilityWork = new WorkTask(FacilityAttributeEditorViewModel.DockPaneId) {
                 Title = "Facility"
             };
-            facilityWork.Items.Add(new WorkTask(createFeaturePaneId)
-            {
+
+            facilityWork.Items.Add(new WorkTask(createFeaturePaneId) {
                 Title = "Add New Geometry"
             });
-            facilityWork.Items.Add(new WorkTask(FacilityAttributeEditorViewModel.DockPaneId, FacilityModel.IsCountyFipsComplete)
-            {
+            facilityWork.Items.Add(new WorkTask(FacilityAttributeEditorViewModel.DockPaneId,
+                                                FacilityModel.IsCountyFipsComplete) {
                 Title = "Add county FIPS"
             });
-            facilityWork.Items.Add(new WorkTask(FacilityAttributeEditorViewModel.DockPaneId, FacilityModel.AreAttributesComplete)
-            {
+            facilityWork.Items.Add(new WorkTask(FacilityAttributeEditorViewModel.DockPaneId,
+                                                FacilityModel.AreAttributesComplete) {
                 Title = "Populate attributes"
             });
 
             // Facility Task: Facility Inspection 
-            var facilityInspectionWork = new WorkTask(FacilityAttributeEditorViewModel.DockPaneId)
-            {
+            var facilityInspectionWork = new WorkTask(FacilityAttributeEditorViewModel.DockPaneId) {
                 Title = "Inspection"
             };
-            facilityInspectionWork.Items.Add(new WorkTask(FacilityAttributeEditorViewModel.DockPaneId, FacilityInspectionModel.IsInspectionAttributesComplete)
-            {
+
+            facilityInspectionWork.Items.Add(new WorkTask(FacilityAttributeEditorViewModel.DockPaneId,
+                                                          FacilityInspectionModel.IsInspectionAttributesComplete) {
                 Title = "Populate attributes"
             });
 
@@ -291,44 +250,42 @@ namespace UIC_Edit_Workflow
             uicTaskRoot.Items.Add(facilityWork); // Add task to root task
 
             // Well Task
-            var wellWork = new WorkTask(WellAttributeEditorViewModel.DockPaneId)
-            {
+            var wellWork = new WorkTask(WellAttributeEditorViewModel.DockPaneId) {
                 Title = "Wells"
             };
-            wellWork.Items.Add(new WorkTask(createFeaturePaneId)
-            {
+
+            wellWork.Items.Add(new WorkTask(createFeaturePaneId) {
                 Title = "Add New Geometry"
             });
-            wellWork.Items.Add(new WorkTask(WellAttributeEditorViewModel.DockPaneId, WellModel.IsWellNameCorrect)
-            {
+            wellWork.Items.Add(new WorkTask(WellAttributeEditorViewModel.DockPaneId, WellModel.IsWellNameCorrect) {
                 Title = "Well Name correct"
             });
-            wellWork.Items.Add(new WorkTask(WellAttributeEditorViewModel.DockPaneId, WellModel.IsWellAttributesComplete)
-            {
+            wellWork.Items.Add(new WorkTask(WellAttributeEditorViewModel.DockPaneId, WellModel.IsWellAttributesComplete) {
                 Title = "Populate attributes"
             });
 
             // Well Task: Well Inspection
-            var wellInspectionWork = new WorkTask(WellAttributeEditorViewModel.DockPaneId)
-            {
+            var wellInspectionWork = new WorkTask(WellAttributeEditorViewModel.DockPaneId) {
                 Title = "Inspection"
             };
-            wellInspectionWork.Items.Add(new WorkTask(WellAttributeEditorViewModel.DockPaneId, WellInspectionModel.IsInspectionAttributesComplete)
-            {
+
+            wellInspectionWork.Items.Add(new WorkTask(WellAttributeEditorViewModel.DockPaneId,
+                                                      WellInspectionModel.IsInspectionAttributesComplete) {
                 Title = "Populate attributes"
             });
+
             wellWork.Items.Add(wellInspectionWork);
             uicTaskRoot.Items.Add(wellWork); // Add task to root task
 
             // Authorization Task
-            var authWork = new WorkTask(WellAttributeEditorViewModel.DockPaneId)
-            {
+            var authWork = new WorkTask(WellAttributeEditorViewModel.DockPaneId) {
                 Title = "Authorizations"
             };
-            authWork.Items.Add(new WorkTask(AuthAttributeEditorViewModel.DockPaneId, () => true)
-            {
+
+            authWork.Items.Add(new WorkTask(AuthAttributeEditorViewModel.DockPaneId, () => true) {
                 Title = "Populate attributes"
             });
+
             uicTaskRoot.Items.Add(authWork); // Add task to root task
 
             // Add root task to work tasks
@@ -341,39 +298,33 @@ namespace UIC_Edit_Workflow
 
             AreModelsDirty = false;
             _populated = true;
-            if (_initializedEvent != null)
-            {
-                
-                MapViewInitializedEvent.Unsubscribe(_initializedEvent);
-                _initializedEvent = null;
+            if (_initializedEvent == null) {
+                return;
             }
+
+            MapViewInitializedEvent.Unsubscribe(_initializedEvent);
+            _initializedEvent = null;
         }
 
         //  Behavior test method
-        public void ChangeStuff()
-        {
+        public void ChangeStuff() {
 //            SetTaskItemsComplete(TableTasks[0]);
         }
 
         /// <summary>
         ///     Show the DockPane.
         /// </summary>
-        internal static void Show()
-        {
+        internal static void Show() {
             var pane = FrameworkApplication.DockPaneManager.Find(DockPaneId);
             pane?.Activate();
         }
 
-        internal static void SubRowEvent()
-        {
+        internal static void SubRowEvent() {
             var pane = FrameworkApplication.DockPaneManager.Find(DockPaneId) as WorkFlowPaneViewModel;
-            QueuedTask.Run(() =>
-            {
-                if (MapView.Active.GetSelectedLayers().Count == 0)
-                {
+            QueuedTask.Run(() => {
+                if (MapView.Active.GetSelectedLayers().Count == 0) {
                     MessageBox.Show("Select a feature class from the Content 'Table of Content' first.");
-                    Utils.RunOnUiThread(() =>
-                    {
+                    Utils.RunOnUiThread(() => {
                         var contentsPane = FrameworkApplication.DockPaneManager.Find("esri_core_contentsDockPane");
                         contentsPane.Activate();
                     });
@@ -385,10 +336,8 @@ namespace UIC_Edit_Workflow
             });
         }
 
-        protected void OnCreatedRowEvent(RowChangedEventArgs args)
-        {
-            Utils.RunOnUiThread(() =>
-            {
+        protected void OnCreatedRowEvent(RowChangedEventArgs args) {
+            Utils.RunOnUiThread(() => {
                 Show();
 
                 var pane = FrameworkApplication.DockPaneManager.Find("esri_editing_AttributesDockPane");
@@ -396,28 +345,22 @@ namespace UIC_Edit_Workflow
             });
         }
 
-        public void SaveDirtyModels()
-        {
-            foreach (ValidatableBindableBase dataModel in _allModels)
-            {
-                if (!dataModel.HasModelChanged())
-                {
+        public void SaveDirtyModels() {
+            foreach (ValidatableBindableBase dataModel in _allModels) {
+                if (!dataModel.HasModelChanged()) {
                     continue;
                 }
 
-                var m = (IWorkTaskModel) dataModel;
+                var m = (IWorkTaskModel)dataModel;
                 m.SaveChanges();
                 Debug.WriteLine(m.GetType());
             }
         }
 
-        public void CheckTaskItemsOnChange(object model, PropertyChangedEventArgs propertyInfo)
-        {
+        public void CheckTaskItemsOnChange(object model, PropertyChangedEventArgs propertyInfo) {
             var areAllModelsClean = true;
-            foreach (ValidatableBindableBase dataModel in _allModels)
-            {
-                if (dataModel.HasModelChanged())
-                {
+            foreach (ValidatableBindableBase dataModel in _allModels) {
+                if (dataModel.HasModelChanged()) {
                     areAllModelsClean = false;
                 }
             }
@@ -427,57 +370,44 @@ namespace UIC_Edit_Workflow
             CheckTaskItems(TableTasks[0]);
         }
 
-        private static void SetTaskItemsComplete(WorkTask workTask)
-        {
-            foreach (var item in workTask.Items)
-            {
+        private static void SetTaskItemsComplete(WorkTask workTask) {
+            foreach (var item in workTask.Items) {
                 SetTaskItemsComplete(item);
             }
 
             workTask.Complete = true;
         }
 
-        private static void CheckTaskItems(WorkTask workTask)
-        {
-            foreach (var item in workTask.Items)
-            {
+        private static void CheckTaskItems(WorkTask workTask) {
+            foreach (var item in workTask.Items) {
                 CheckTaskItems(item);
             }
 
             workTask.CheckForCompletion();
         }
 
-        public void ShowPaneTest(string paneId)
-        {
-            Utils.RunOnUiThread(() =>
-            {
+        public void ShowPaneTest(string paneId) {
+            Utils.RunOnUiThread(() => {
                 var pane = FrameworkApplication.DockPaneManager.Find(paneId);
                 pane.Activate();
             });
         }
 
-        private async void CheckForSugestion(string partialId)
-        {
-            await QueuedTask.Run(() =>
-            {
+        private async void CheckForSugestion(string partialId) {
+            await QueuedTask.Run(() => {
                 var suggestedId = "";
                 var rowCount = 0;
-                var qf = new QueryFilter
-                {
+                var qf = new QueryFilter {
                     WhereClause = $"FacilityID LIKE '{partialId}%'"
                 };
 
-                using (var cursor = FacilityModel.FeatureLayer.Search(qf))
-                {
-                    while (cursor.MoveNext())
-                    {
-                        using (var row = cursor.Current)
-                        {
+                using (var cursor = FacilityModel.FeatureLayer.Search(qf)) {
+                    while (cursor.MoveNext()) {
+                        using (var row = cursor.Current) {
                             suggestedId = row[FacilityModel.IdField].ToString();
                             rowCount++;
 
-                            if (rowCount > 1)
-                            {
+                            if (rowCount > 1) {
                                 UicSuggestion = null;
 
                                 return;
@@ -490,19 +420,15 @@ namespace UIC_Edit_Workflow
             });
         }
 
-        private Task GetSelectedFeature()
-        {
-            var t = QueuedTask.Run(async () =>
-            {
+        private Task GetSelectedFeature() {
+            var t = QueuedTask.Run(async () => {
                 string selectedId;
                 string countyFips;
                 Polygon facilityPoly;
                 var currentSelection = SelectedLayer.GetSelection();
 
-                using (var cursor = currentSelection.Search())
-                {
-                    using (var row = cursor.Current)
-                    {
+                using (var cursor = currentSelection.Search()) {
+                    using (var row = cursor.Current) {
                         var facilityFeature = row as Feature;
                         facilityPoly = facilityFeature.GetShape() as Polygon;
 
@@ -512,25 +438,19 @@ namespace UIC_Edit_Workflow
                     }
                 }
 
-                if (string.IsNullOrWhiteSpace(countyFips))
-                {
+                if (string.IsNullOrWhiteSpace(countyFips)) {
                     // verify it is simple
                     var isSimple = GeometryEngine.Instance.IsSimpleAsFeature(facilityPoly);
                     // find the centroid
                     var facCentroid = GeometryEngine.Instance.Centroid(facilityPoly);
                     await AssignCountyFips(facCentroid);
-                }
-                else
-                {
+                } else {
                     SelectedFips = countyFips;
                 }
 
-                if (string.IsNullOrWhiteSpace(selectedId))
-                {
+                if (string.IsNullOrWhiteSpace(selectedId)) {
                     await AssignFacilityId();
-                }
-                else
-                {
+                } else {
                     UicSelection = selectedId;
                 }
             });
@@ -538,18 +458,14 @@ namespace UIC_Edit_Workflow
             return t;
         }
 
-        private Task ModifyLayerSelection(SelectionCombinationMethod method)
-        {
-            var t = QueuedTask.Run(() =>
-            {
-                if (MapView.Active == null || SelectedLayer == null || UicSelection == null)
-                {
+        private Task ModifyLayerSelection(SelectionCombinationMethod method) {
+            var t = QueuedTask.Run(() => {
+                if (MapView.Active == null || SelectedLayer == null || UicSelection == null) {
                     return;
                 }
 
                 var wc = $"FacilityID = \"{UicSelection}\"";
-                SelectedLayer.Select(new QueryFilter
-                {
+                SelectedLayer.Select(new QueryFilter {
                     WhereClause = wc
                 }, method);
 
@@ -559,18 +475,14 @@ namespace UIC_Edit_Workflow
             return t;
         }
 
-        private Task AssignFacilityId()
-        {
-            var t = QueuedTask.Run(() =>
-            {
+        private Task AssignFacilityId() {
+            var t = QueuedTask.Run(() => {
                 //Create list of oids to update
-                var oidSet = new List<long>
-                {
+                var oidSet = new List<long> {
                     SelectedOid
                 };
                 //Create edit operation and update
-                var op = new EditOperation
-                {
+                var op = new EditOperation {
                     Name = "Update id"
                 };
                 var insp = new Inspector();
@@ -582,8 +494,7 @@ namespace UIC_Edit_Workflow
 
                 var currentGuid = Convert.ToString(insp["GUID"]);
                 var hasGuid = Guid.TryParse(currentGuid, out Guid facGuid);
-                if (!hasGuid)
-                {
+                if (!hasGuid) {
                     facGuid = Guid.NewGuid();
                     insp["GUID"] = facGuid;
                 }
@@ -604,38 +515,30 @@ namespace UIC_Edit_Workflow
             return t;
         }
 
-        public Task AssignCountyFips(MapPoint facCentroid)
-        {
-            return QueuedTask.Run(async () =>
-            {
+        public Task AssignCountyFips(MapPoint facCentroid) {
+            return QueuedTask.Run(async () => {
                 var map = MapView.Active.Map;
                 var foundFips = "foundFips";
-                var counties = (FeatureLayer) map.FindLayers("Counties").First();
+                var counties = (FeatureLayer)map.FindLayers("Counties").First();
                 // Using a spatial query filter to find all features which have a certain district name and lying within a given Polygon.
-                var spatialQueryFilter = new SpatialQueryFilter
-                {
+                var spatialQueryFilter = new SpatialQueryFilter {
                     FilterGeometry = facCentroid,
                     SpatialRelationship = SpatialRelationship.Within
                 };
 
-                using (var cursor = counties.Search(spatialQueryFilter))
-                {
-                    while (cursor.MoveNext())
-                    {
-                        using (var feature = (Feature) cursor.Current)
-                        {
+                using (var cursor = counties.Search(spatialQueryFilter)) {
+                    while (cursor.MoveNext()) {
+                        using (var feature = (Feature)cursor.Current) {
                             // Process the feature. For example..
                             SelectedFips = Convert.ToString(feature["FIPS_STR"]);
                         }
                     }
                 }
-                var oidSet = new List<long>
-                {
+                var oidSet = new List<long> {
                     SelectedOid
                 };
                 //Create edit operation and update
-                var op = new EditOperation
-                {
+                var op = new EditOperation {
                     Name = "Update fips"
                 };
                 var insp = new Inspector();
@@ -647,8 +550,7 @@ namespace UIC_Edit_Workflow
             });
         }
 
-        private async void UpdateModel(string uicId)
-        {
+        private async void UpdateModel(string uicId) {
             await FacilityModel.UpdateModel(uicId);
             AreModelsDirty = false;
             CheckTaskItems(TableTasks[0]);
