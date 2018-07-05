@@ -16,7 +16,7 @@ namespace UIC_Edit_Workflow.Views
         private readonly WellModel _wellModel = Module1.GetWellModel();
         private readonly WellInspectionModel _inspectionModel = Module1.GetWellInspectionModel();
 
-        public const string DockPaneId = "UIC_Edit_Workflow_WellAttributeEditor";
+        public const string DockPaneId = "WellAttributeEditorPane";
 
         protected WellAttributeEditorViewModel()
         {

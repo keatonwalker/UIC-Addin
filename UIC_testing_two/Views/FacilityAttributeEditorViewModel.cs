@@ -7,7 +7,7 @@ namespace UIC_Edit_Workflow.Views
 {
     internal class FacilityAttributeEditorViewModel : DockPane
     {
-        public const string DockPaneId = "UIC_Edit_Workflow_FacilityAttributeEditor";
+        public const string DockPaneId = "FacilityAttributeEditorPane";
         private readonly FacilityModel _facilityModel = Module1.GetFacilityModel();
         private readonly FacilityInspectionModel _inspectionModel = Module1.GetFacilityInspectionModel();
 

@@ -24,7 +24,7 @@ using UIC_Edit_Workflow.Views;
 
 namespace UIC_Edit_Workflow {
     internal class WorkFlowPaneViewModel : DockPane {
-        public const string DockPaneId = "UIC_Edit_Workflow_WorkFlowPane";
+        public const string DockPaneId = "WorkflowPane";
 
         private List<BindableBase> _allModels;
         private RelayCommand _assignIdCmd;
@@ -384,39 +384,35 @@ namespace UIC_Edit_Workflow {
             workTask.CheckForCompletion();
         }
 
-        public void ShowPaneTest(string paneId) {
-            Utils.RunOnUiThread(() => {
-                var pane = FrameworkApplication.DockPaneManager.Find(paneId);
-                pane.Activate();
-            });
-        }
+        public void ShowPaneTest(string paneId) => Utils.RunOnUiThread(() => {
+            var pane = FrameworkApplication.DockPaneManager.Find(paneId);
+            pane.Activate();
+        });
 
-        private async void CheckForSugestion(string partialId) {
-            await QueuedTask.Run(() => {
-                var suggestedId = "";
-                var rowCount = 0;
-                var qf = new QueryFilter {
-                    WhereClause = $"FacilityID LIKE '{partialId}%'"
-                };
+        private async void CheckForSugestion(string partialId) => await QueuedTask.Run(() => {
+            var suggestedId = "";
+            var rowCount = 0;
+            var qf = new QueryFilter {
+                WhereClause = $"FacilityID LIKE '{partialId}%'"
+            };
 
-                using (var cursor = FacilityModel.FeatureLayer.Search(qf)) {
-                    while (cursor.MoveNext()) {
-                        using (var row = cursor.Current) {
-                            suggestedId = row[FacilityModel.IdField].ToString();
-                            rowCount++;
+            using (var cursor = FacilityModel.FeatureLayer.Search(qf)) {
+                while (cursor.MoveNext()) {
+                    using (var row = cursor.Current) {
+                        suggestedId = row[FacilityModel.IdField].ToString();
+                        rowCount++;
 
-                            if (rowCount > 1) {
-                                UicSuggestion = null;
+                        if (rowCount > 1) {
+                            UicSuggestion = null;
 
-                                return;
-                            }
+                            return;
                         }
                     }
                 }
+            }
 
-                UicSuggestion = suggestedId;
-            });
-        }
+            UicSuggestion = suggestedId;
+        });
 
         private Task GetSelectedFeature() {
             var t = QueuedTask.Run(async () => {
