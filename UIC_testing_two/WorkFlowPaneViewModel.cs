@@ -61,17 +61,17 @@ namespace UIC_Edit_Workflow {
 
         public bool EmptyFips {
             get => _emptyFips;
-            set { SetProperty(ref _emptyFips, value, () => EmptyFips); }
+            set => SetProperty(ref _emptyFips, value, () => EmptyFips);
         }
 
         public bool AreModelsDirty {
             get => _modelDirty;
-            set { SetProperty(ref _modelDirty, value, () => AreModelsDirty); }
+            set => SetProperty(ref _modelDirty, value, () => AreModelsDirty);
         }
 
         public string Heading {
             get => _heading;
-            set { SetProperty(ref _heading, value, () => Heading); }
+            set => SetProperty(ref _heading, value, () => Heading);
         }
 
         public ObservableCollection<WorkTask> TableTasks { get; }
@@ -83,7 +83,7 @@ namespace UIC_Edit_Workflow {
 
             set {
                 SetProperty(ref _selectedFips, value, () => SelectedFips);
-                if (_selectedFips.Length == 5 && int.TryParse(_selectedFips, out int fips)) {
+                if (_selectedFips.Length == 5 && int.TryParse(_selectedFips, out var fips)) {
                     EmptyFips = false;
                 }
             }
@@ -107,12 +107,12 @@ namespace UIC_Edit_Workflow {
 
         public string UicSuggestion {
             get => _uicSuggestion;
-            set { SetProperty(ref _uicSuggestion, value, () => UicSuggestion); }
+            set => SetProperty(ref _uicSuggestion, value, () => UicSuggestion);
         }
 
         public BasicFeatureLayer SelectedLayer {
             get => _selectedLayer;
-            set { SetProperty(ref _selectedLayer, value, () => SelectedLayer); }
+            set => SetProperty(ref _selectedLayer, value, () => SelectedLayer);
         }
 
         public ICommand UseFacilitySuggestion {
@@ -336,14 +336,12 @@ namespace UIC_Edit_Workflow {
             });
         }
 
-        protected void OnCreatedRowEvent(RowChangedEventArgs args) {
-            Utils.RunOnUiThread(() => {
-                Show();
+        protected void OnCreatedRowEvent(RowChangedEventArgs args) => Utils.RunOnUiThread(() => {
+            Show();
 
-                var pane = FrameworkApplication.DockPaneManager.Find("esri_editing_AttributesDockPane");
-                pane.Activate();
-            });
-        }
+            var pane = FrameworkApplication.DockPaneManager.Find("esri_editing_AttributesDockPane");
+            pane.Activate();
+        });
 
         public void SaveDirtyModels() {
             foreach (ValidatableBindableBase dataModel in _allModels) {
@@ -493,7 +491,7 @@ namespace UIC_Edit_Workflow {
                 //insp["CountyFIPS"] = fips;
 
                 var currentGuid = Convert.ToString(insp["GUID"]);
-                var hasGuid = Guid.TryParse(currentGuid, out Guid facGuid);
+                var hasGuid = Guid.TryParse(currentGuid, out var facGuid);
                 if (!hasGuid) {
                     facGuid = Guid.NewGuid();
                     insp["GUID"] = facGuid;
@@ -515,40 +513,38 @@ namespace UIC_Edit_Workflow {
             return t;
         }
 
-        public Task AssignCountyFips(MapPoint facCentroid) {
-            return QueuedTask.Run(async () => {
-                var map = MapView.Active.Map;
-                var foundFips = "foundFips";
-                var counties = (FeatureLayer)map.FindLayers("Counties").First();
-                // Using a spatial query filter to find all features which have a certain district name and lying within a given Polygon.
-                var spatialQueryFilter = new SpatialQueryFilter {
-                    FilterGeometry = facCentroid,
-                    SpatialRelationship = SpatialRelationship.Within
-                };
+        public Task AssignCountyFips(MapPoint facCentroid) => QueuedTask.Run(async () => {
+            var map = MapView.Active.Map;
+            var foundFips = "foundFips";
+            var counties = (FeatureLayer)map.FindLayers("Counties").First();
+            // Using a spatial query filter to find all features which have a certain district name and lying within a given Polygon.
+            var spatialQueryFilter = new SpatialQueryFilter {
+                FilterGeometry = facCentroid,
+                SpatialRelationship = SpatialRelationship.Within
+            };
 
-                using (var cursor = counties.Search(spatialQueryFilter)) {
-                    while (cursor.MoveNext()) {
-                        using (var feature = (Feature)cursor.Current) {
-                            // Process the feature. For example..
-                            SelectedFips = Convert.ToString(feature["FIPS_STR"]);
-                        }
+            using (var cursor = counties.Search(spatialQueryFilter)) {
+                while (cursor.MoveNext()) {
+                    using (var feature = (Feature)cursor.Current) {
+                        // Process the feature. For example..
+                        SelectedFips = Convert.ToString(feature["FIPS_STR"]);
                     }
                 }
-                var oidSet = new List<long> {
+            }
+            var oidSet = new List<long> {
                     SelectedOid
                 };
-                //Create edit operation and update
-                var op = new EditOperation {
-                    Name = "Update fips"
-                };
-                var insp = new Inspector();
-                insp.Load(SelectedLayer, oidSet);
-                insp["CountyFIPS"] = SelectedFips;
-                await insp.ApplyAsync();
+            //Create edit operation and update
+            var op = new EditOperation {
+                Name = "Update fips"
+            };
+            var insp = new Inspector();
+            insp.Load(SelectedLayer, oidSet);
+            insp["CountyFIPS"] = SelectedFips;
+            await insp.ApplyAsync();
 
-                await Project.Current.SaveEditsAsync();
-            });
-        }
+            await Project.Current.SaveEditsAsync();
+        });
 
         private async void UpdateModel(string uicId) {
             await FacilityModel.UpdateModel(uicId);
