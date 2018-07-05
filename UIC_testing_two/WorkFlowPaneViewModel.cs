@@ -292,9 +292,9 @@ namespace UIC_Edit_Workflow {
             TableTasks.Add(uicTaskRoot);
 
             //Init the dockpanes in the framework. Loads data before and refernces.
-            FrameworkApplication.DockPaneManager.Find(WellAttributeEditorViewModel.DockPaneId);
-            FrameworkApplication.DockPaneManager.Find(FacilityAttributeEditorViewModel.DockPaneId);
-            FrameworkApplication.DockPaneManager.Find(AuthAttributeEditorViewModel.DockPaneId);
+//            FrameworkApplication.DockPaneManager.Find(WellAttributeEditorViewModel.DockPaneId);
+//            FrameworkApplication.DockPaneManager.Find(FacilityAttributeEditorViewModel.DockPaneId);
+//            FrameworkApplication.DockPaneManager.Find(AuthAttributeEditorViewModel.DockPaneId);
 
             AreModelsDirty = false;
             _populated = true;

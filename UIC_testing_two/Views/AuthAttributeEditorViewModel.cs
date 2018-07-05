@@ -6,8 +6,8 @@ using UIC_Edit_Workflow.Models;
 namespace UIC_Edit_Workflow.Views {
     internal class AuthAttributeEditorViewModel : DockPane {
         public const string DockPaneId = "AuthAttributeEditorPane";
-        private static readonly FacilityModel FacilityModel = UicWorkflowModule.GetFacilityModel();
-        public readonly AuthorizationModel _authModel = UicWorkflowModule.GetAuthorizationModel();
+//        private static readonly FacilityModel FacilityModel = UicWorkflowModule.GetFacilityModel();
+//        private readonly AuthorizationModel _authModel = UicWorkflowModule.GetAuthorizationModel();
 
         private RelayCommand _addNewRecord;
 
@@ -44,10 +44,10 @@ namespace UIC_Edit_Workflow.Views {
         }
 
         private void AddNewRecord() {
-            var facGuid = FacilityModel.FacilityGuid;
-            var facFips = FacilityModel.CountyFips;
-
-            _authModel.AddNew(facGuid, facFips);
+//            var facGuid = FacilityModel.FacilityGuid;
+//            var facFips = FacilityModel.CountyFips;
+//
+//            _authModel.AddNew(facGuid, facFips);
         }
     }
 }

@@ -60,14 +60,13 @@ namespace UIC_Edit_Workflow {
             return _wellInspection ?? (_wellInspection = new WellInspectionModel(standaloneTable));
         }
 
-        public static BasicFeatureLayer FindLayer(string layerName, MapView activeView) => QueuedTask.Run(() => {
+        public static BasicFeatureLayer FindLayer(string layerName, MapView activeView) {
             var layers = activeView.Map.GetLayersAsFlattenedList();
 
             return (BasicFeatureLayer)layers.FirstOrDefault(x => string.Equals(SplitLast(x.Name),
                                                                                SplitLast(layerName),
-                                                                               StringComparison
-                                                                                   .InvariantCultureIgnoreCase));
-        }).Result;
+                                                                               StringComparison.InvariantCultureIgnoreCase));
+        }
 
         public static StandaloneTable FindTable(string tableName, MapView activeView) => QueuedTask.Run(() => {
             var tables = activeView.Map.StandaloneTables;

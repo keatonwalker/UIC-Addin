@@ -1,3 +1,4 @@
+using System.Collections.ObjectModel;
 using System.Windows.Input;
 using ArcGIS.Desktop.Framework;
 using ArcGIS.Desktop.Framework.Contracts;
@@ -6,15 +7,22 @@ using UIC_Edit_Workflow.Models;
 namespace UIC_Edit_Workflow.Views {
     internal class FacilityAttributeEditorViewModel : DockPane {
         public const string DockPaneId = "FacilityAttributeEditorPane";
-        private readonly FacilityModel _facilityModel = UicWorkflowModule.GetFacilityModel();
-        private readonly FacilityInspectionModel _inspectionModel = UicWorkflowModule.GetFacilityInspectionModel();
+//        private readonly FacilityModel _facilityModels = UicWorkflowModule.GetFacilityModel();
+//        private readonly FacilityInspectionModel _inspectionModel = UicWorkflowModule.GetFacilityInspectionModel();
 
         private RelayCommand _addNewInspection;
+
+        public FacilityModel FacilityModel {
+            get => _facilityModel;
+            set => SetProperty(ref _facilityModel, value, () => FacilityModel);
+        }
 
         /// <summary>
         ///     Text shown near the top of the DockPane.
         /// </summary>
         private string _heading = "Facility Attributes";
+
+        private FacilityModel _facilityModel;
 
         public string Heading {
             get => _heading;
@@ -40,9 +48,9 @@ namespace UIC_Edit_Workflow.Views {
         }
 
         private void AddNewInspection() {
-            var facGuid = _facilityModel.FacilityGuid;
-
-            _inspectionModel.AddNew(facGuid);
+//            var facGuid = FacilityModel.FacilityGuid;
+//
+//            _inspectionModel.AddNew(facGuid);
         }
     }
 }
