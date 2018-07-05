@@ -7,11 +7,9 @@ using ArcGIS.Desktop.Framework.Threading.Tasks;
 using ArcGIS.Desktop.Mapping;
 using UIC_Edit_Workflow.Models;
 
-namespace UIC_Edit_Workflow
-{
-    internal class Module1 : Module
-    {
-        private static Module1 _this;
+namespace UIC_Edit_Workflow {
+    internal class UicWorkflowModule : Module {
+        private static UicWorkflowModule _this;
         private static FacilityModel _facility;
         private static WellModel _well;
         private static AuthorizationModel _authorization;
@@ -21,45 +19,41 @@ namespace UIC_Edit_Workflow
         /// <summary>
         ///     Retrieve the singleton instance to this module here
         /// </summary>
-        public static Module1 Current => _this ?? (_this =
-                                             (Module1) FrameworkApplication.FindModule("UIC_Edit_Workflow_Module"));
+        public static UicWorkflowModule Current => _this ?? (_this =
+                                                       (UicWorkflowModule)
+                                                       FrameworkApplication.FindModule("UicForkflowModule"));
 
         public static MapView ActiveMapView { get; set; }
 
-        public static FacilityModel GetFacilityModel(MapView view=null)
-        {
+        public static FacilityModel GetFacilityModel(MapView view = null) {
             var activeView = MapView.Active ?? view;
             var featureLayer = FindLayer(FacilityModel.TableName, activeView) as FeatureLayer;
 
             return _facility ?? (_facility = new FacilityModel(featureLayer));
         }
 
-        public static WellModel GetWellModel(MapView view=null)
-        {
+        public static WellModel GetWellModel(MapView view = null) {
             var activeView = MapView.Active ?? view;
             var featureLayer = FindLayer(WellModel.TableName, activeView) as FeatureLayer;
 
             return _well ?? (_well = new WellModel(featureLayer));
         }
 
-        public static AuthorizationModel GetAuthorizationModel(MapView view=null)
-        {
+        public static AuthorizationModel GetAuthorizationModel(MapView view = null) {
             var activeView = MapView.Active ?? view;
             var standaloneTable = FindTable(AuthorizationModel.TableName, activeView);
 
             return _authorization ?? (_authorization = new AuthorizationModel(standaloneTable));
         }
 
-        public static FacilityInspectionModel GetFacilityInspectionModel(MapView view=null)
-        {
+        public static FacilityInspectionModel GetFacilityInspectionModel(MapView view = null) {
             var activeView = MapView.Active ?? view;
             var standaloneTable = FindTable(FacilityInspectionModel.TableName, activeView);
 
             return _facilityInspection ?? (_facilityInspection = new FacilityInspectionModel(standaloneTable));
         }
 
-        public static WellInspectionModel GetWellInspectionModel(MapView view=null)
-        {
+        public static WellInspectionModel GetWellInspectionModel(MapView view = null) {
             var activeView = MapView.Active ?? view;
             var standaloneTable = FindTable(WellInspectionModel.TableName, activeView);
 
@@ -69,8 +63,10 @@ namespace UIC_Edit_Workflow
         public static BasicFeatureLayer FindLayer(string layerName, MapView activeView) => QueuedTask.Run(() => {
             var layers = activeView.Map.GetLayersAsFlattenedList();
 
-            return (BasicFeatureLayer)layers.FirstOrDefault(x => string.Equals(SplitLast(x.Name), SplitLast(layerName),
-                                                                               StringComparison.InvariantCultureIgnoreCase));
+            return (BasicFeatureLayer)layers.FirstOrDefault(x => string.Equals(SplitLast(x.Name),
+                                                                               SplitLast(layerName),
+                                                                               StringComparison
+                                                                                   .InvariantCultureIgnoreCase));
         }).Result;
 
         public static StandaloneTable FindTable(string tableName, MapView activeView) => QueuedTask.Run(() => {
@@ -79,10 +75,8 @@ namespace UIC_Edit_Workflow
                                                             StringComparison.InvariantCultureIgnoreCase));
         }).Result;
 
-        private static string SplitLast(string x)
-        {
-            if (!x.Contains('.'))
-            {
+        private static string SplitLast(string x) {
+            if (!x.Contains('.')) {
                 return x;
             }
 

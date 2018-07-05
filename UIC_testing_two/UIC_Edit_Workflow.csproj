@@ -114,7 +114,7 @@
     <Compile Include="Models\BindableBase.cs" />
     <Compile Include="Models\IWorkTaskModel.cs" />
     <Compile Include="Models\DataUpdateDelegates.cs" />
-    <Compile Include="Module1.cs" />
+    <Compile Include="UICWorkflow.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Models\FacilityModel.cs" />
     <Compile Include="Validations\UicValidations.cs" />

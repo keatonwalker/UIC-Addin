@@ -1,4 +1,6 @@
-<ArcGIS defaultAssembly="UIC_Edit_Workflow.dll" defaultNamespace="UIC_Edit_Workflow" xmlns="http://schemas.esri.com/DADF/Registry" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://schemas.esri.com/DADF/Registry file:///C:/Program%20Files/ArcGIS/Pro/bin/ArcGIS.Desktop.Framework.xsd">
+<ArcGIS defaultAssembly="UIC_Edit_Workflow.dll" defaultNamespace="UIC_Edit_Workflow"
+        xmlns="http://schemas.esri.com/DADF/Registry" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://schemas.esri.com/DADF/Registry file:///C:/Program%20Files/ArcGIS/Pro/bin/ArcGIS.Desktop.Framework.xsd">
   <AddInInfo id="{262e5e70-4fca-4e76-9ee2-adf5b2cca7c0}" version="1.0" desktopVersion="2.0.8933">
     <Name>UIC_testing_two</Name>
     <Description>UIC_testing_two description</Description>
@@ -11,7 +13,8 @@
                     Content, Framework, Editing, Geodatabase, Geometry, Geoprocessing, Layouts, Map Authoring, Map Exploration -->
   </AddInInfo>
   <modules>
-    <insertModule id="UIC_Edit_Workflow_Module" className="Module1" condition="esri_core_MapPane" autoLoad="false" caption="Module1">
+    <insertModule id="UicForkflowModule" className="UicWorkflowModule" condition="esri_core_MapPane" autoLoad="false"
+                  caption="Module1">
       <!-- uncomment to have the control hosted on a separate tab-->
       <tabs>
         <!--<tab id="UIC_Edit_Workflow_Tab1" caption="New Tab">
@@ -21,7 +24,7 @@
       <groups>
         <!-- comment this out if you have no controls on the Addin tab to avoid
               an empty group-->
-        <group id="UIC_Edit_Workflow_Group1" caption="Group 1" appearsOnAddInTab="true">
+        <group id="UIC_Edit_Workflow_Group1" caption="Group 1" keytip="UIC Workflow" appearsOnAddInTab="true">
           <!-- host controls within groups -->
           <button refID="WorkflowPane_ShowButton" size="large" />
           <!--<button refID="UIC_Edit_Workflow_AttributeEditor_ShowButton" size="large" />
@@ -31,9 +34,12 @@
       </groups>
       <controls>
         <!-- add your controls here -->
-        <button keytip="Heyyo" id="WorkflowPane_ShowButton" caption="Start UIC WorkFlow" className="WorkFlowPane_ShowButton" loadOnClick="true" smallImage="Images\GenericButtonPurple16.png" largeImage="Images\GenericButtonPurple32.png">
+        <button keytip="Heyyo" id="WorkflowPane_ShowButton" caption="Start UIC WorkFlow"
+                className="WorkFlowPaneShowButton" loadOnClick="true" smallImage="Images\GenericButtonPurple16.png"
+                largeImage="Images\GenericButtonPurple32.png">
           <tooltip heading="Show Workflow">
-            Show Workflow<disabledText /></tooltip>
+            Show Workflow<disabledText />
+          </tooltip>
         </button>
         <!--<button id="UIC_Edit_Workflow_AttributeEditor_ShowButton" caption="Show Facility Attributes" className="AttributeEditor_ShowButton" loadOnClick="true" smallImage="Images\GenericButtonPurple16.png" largeImage="Images\GenericButtonPurple32.png">
           <tooltip heading="Show Dockpane">Show attribute editor<disabledText /></tooltip>
@@ -44,21 +50,28 @@
         <!--<button id="AuthAttributeEditorPane_ShowButton" caption="Show AuthAttributeEditor" className="AuthAttributeEditor_ShowButton" loadOnClick="true" smallImage="Images\GenericButtonPurple16.png" largeImage="Images\GenericButtonPurple32.png">
           <tooltip heading="Show Dockpane">Show Dockpane<disabledText /></tooltip>
         </button>-->
-<!--        <button keytip="hi" id="UIC_Edit_Workflow_Views_TestDockPane_ShowButton" caption="Show TestDockPane" className="UIC_Edit_Workflow.Views.TestDockPane_ShowButton" loadOnClick="true" smallImage="Images\GenericButtonPurple16.png" largeImage="Images\GenericButtonPurple32.png">-->
-<!--          <tooltip heading="Show Dockpane">Show Dockpane<disabledText /></tooltip>-->
-<!--        </button>-->
+        <!--        <button keytip="hi" id="UIC_Edit_Workflow_Views_TestDockPane_ShowButton" caption="Show TestDockPane" className="UIC_Edit_Workflow.Views.TestDockPane_ShowButton" loadOnClick="true" smallImage="Images\GenericButtonPurple16.png" largeImage="Images\GenericButtonPurple32.png">-->
+        <!--          <tooltip heading="Show Dockpane">Show Dockpane<disabledText /></tooltip>-->
+        <!--        </button>-->
       </controls>
       <dockPanes>
-        <dockPane id="WorkflowPane" caption="UIC Workflow" className="UIC_Edit_Workflow.WorkFlowPaneViewModel" dock="group" dockWith="esri_core_contentsDockPane">
+        <dockPane id="WorkflowPane" caption="UIC Workflow" className="UIC_Edit_Workflow.WorkFlowPaneViewModel"
+                  dock="group" dockWith="esri_core_contentsDockPane">
           <content className="UIC_Edit_Workflow.WorkFlowPaneView" />
         </dockPane>
-        <dockPane id="FacilityAttributeEditorPane" caption="Facility Editor" className="UIC_Edit_Workflow.Views.FacilityAttributeEditorViewModel" dock="group" dockWith="esri_core_projectDockPane">
+        <dockPane id="FacilityAttributeEditorPane" caption="Facility Editor"
+                  className="UIC_Edit_Workflow.Views.FacilityAttributeEditorViewModel" dock="group"
+                  dockWith="esri_core_projectDockPane">
           <content className="UIC_Edit_Workflow.Views.AttributeEditorView" />
         </dockPane>
-        <dockPane id="WellAttributeEditorPane" caption="Well Editor" className="UIC_Edit_Workflow.Views.WellAttributeEditorViewModel" dock="group" dockWith="esri_core_projectDockPane">
+        <dockPane id="WellAttributeEditorPane" caption="Well Editor"
+                  className="UIC_Edit_Workflow.Views.WellAttributeEditorViewModel" dock="group"
+                  dockWith="esri_core_projectDockPane">
           <content className="UIC_Edit_Workflow.Views.WellAttributeEditorView" />
         </dockPane>
-        <dockPane id="AuthAttributeEditorPane" caption="Authorization Editor" className="UIC_Edit_Workflow.Views.AuthAttributeEditorViewModel" dock="group" dockWith="esri_core_projectDockPane">
+        <dockPane id="AuthAttributeEditorPane" caption="Authorization Editor"
+                  className="UIC_Edit_Workflow.Views.AuthAttributeEditorViewModel" dock="group"
+                  dockWith="esri_core_projectDockPane">
           <content className="UIC_Edit_Workflow.Views.AuthAttributeEditorView" />
         </dockPane>
       </dockPanes>

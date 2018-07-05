@@ -173,12 +173,12 @@ namespace UIC_Edit_Workflow {
                 return;
             }
 
-            SelectedLayer = Module1.FindLayer("uicfacility", view);
-            AuthModel = Module1.GetAuthorizationModel(view);
-            FacilityInspectionModel = Module1.GetFacilityInspectionModel(view);
-            FacilityModel = Module1.GetFacilityModel(view);
-            WellInspectionModel = Module1.GetWellInspectionModel(view);
-            WellModel = Module1.GetWellModel(view);
+            SelectedLayer = UicWorkflowModule.FindLayer("uicfacility", view);
+            AuthModel = UicWorkflowModule.GetAuthorizationModel(view);
+            FacilityInspectionModel = UicWorkflowModule.GetFacilityInspectionModel(view);
+            FacilityModel = UicWorkflowModule.GetFacilityModel(view);
+            WellInspectionModel = UicWorkflowModule.GetWellInspectionModel(view);
+            WellModel = UicWorkflowModule.GetWellModel(view);
 
             _allModels = new List<BindableBase>();
             var facilityControlledModels = new List<IWorkTaskModel> {
