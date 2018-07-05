@@ -26,7 +26,7 @@ namespace UIC_Edit_Workflow
 {
     internal class WorkFlowPaneViewModel : DockPane
     {
-        public const string PaneId = "UIC_Edit_Workflow_WorkFlowPane";
+        public const string DockPaneId = "UIC_Edit_Workflow_WorkFlowPane";
 
         private List<BindableBase> _allModels;
         private RelayCommand _assignIdCmd;
@@ -53,14 +53,12 @@ namespace UIC_Edit_Workflow
         public bool EmptyFips
         {
             get => _emptyFips;
-
             set { SetProperty(ref _emptyFips, value, () => EmptyFips); }
         }
 
         public bool AreModelsDirty
         {
             get => _modelDirty;
-
             set { SetProperty(ref _modelDirty, value, () => AreModelsDirty); }
         }
 
@@ -253,53 +251,69 @@ namespace UIC_Edit_Workflow
             FacilityModel.PropertyChanged += CheckTaskItemsOnChange;
             _allModels.Add(FacilityModel);
 
-            var uicTaskRoot = new WorkTask("esri_editing_AttributesDockPane") { Title = "UIC Facility Workflow" };
+            const string editingPaneId = "esri_editing_AttributesDockPane";
+            const string createFeaturePaneId = "esri_editing_CreateFeaturesDockPane";
+
+            var uicTaskRoot = new WorkTask(editingPaneId)
+            {
+                Title = "UIC Facility Workflow"
+            };
 
             // Facility Task
-            var facilityWork = new WorkTask("UIC_Edit_Workflow_FacilityAttributeEditor") { Title = "Facility" };
-            facilityWork.Items.Add(new WorkTask("esri_editing_CreateFeaturesDockPane") { Title = "Add New Geometry" });
-            facilityWork.Items.Add(new WorkTask("UIC_Edit_Workflow_FacilityAttributeEditor",
-                                                FacilityModel.IsCountyFipsComplete)
-                                       { Title = "Add county FIPS" });
-            facilityWork.Items.Add(new WorkTask("UIC_Edit_Workflow_FacilityAttributeEditor",
-                                                FacilityModel.AreAttributesComplete)
-                                       { Title = "Populate attributes" });
-
-            // Facility Task: Facility Inspection 
-            var facilityInspectionWork =
-                new WorkTask("UIC_Edit_Workflow_FacilityAttributeEditor") { Title = "Inspection" };
-            facilityInspectionWork.Items.Add(new WorkTask("UIC_Edit_Workflow_FacilityAttributeEditor",
-                                                          FacilityInspectionModel.IsInspectionAttributesComplete)
+            var facilityWork = new WorkTask(FacilityAttributeEditorViewModel.DockPaneId)
+            {
+                Title = "Facility"
+            };
+            facilityWork.Items.Add(new WorkTask(createFeaturePaneId)
+            {
+                Title = "Add New Geometry"
+            });
+            facilityWork.Items.Add(new WorkTask(FacilityAttributeEditorViewModel.DockPaneId, FacilityModel.IsCountyFipsComplete)
+            {
+                Title = "Add county FIPS"
+            });
+            facilityWork.Items.Add(new WorkTask(FacilityAttributeEditorViewModel.DockPaneId, FacilityModel.AreAttributesComplete)
             {
                 Title = "Populate attributes"
             });
+
+            // Facility Task: Facility Inspection 
+            var facilityInspectionWork = new WorkTask(FacilityAttributeEditorViewModel.DockPaneId)
+            {
+                Title = "Inspection"
+            };
+            facilityInspectionWork.Items.Add(new WorkTask(FacilityAttributeEditorViewModel.DockPaneId, FacilityInspectionModel.IsInspectionAttributesComplete)
+            {
+                Title = "Populate attributes"
+            });
+
             facilityWork.Items.Add(facilityInspectionWork);
             uicTaskRoot.Items.Add(facilityWork); // Add task to root task
 
             // Well Task
-            var wellWork = new WorkTask(WellAttributeEditorViewModel.PaneId)
+            var wellWork = new WorkTask(WellAttributeEditorViewModel.DockPaneId)
             {
                 Title = "Wells"
             };
-            wellWork.Items.Add(new WorkTask("esri_editing_CreateFeaturesDockPane")
+            wellWork.Items.Add(new WorkTask(createFeaturePaneId)
             {
                 Title = "Add New Geometry"
             });
-            wellWork.Items.Add(new WorkTask(WellAttributeEditorViewModel.PaneId, WellModel.IsWellNameCorrect)
+            wellWork.Items.Add(new WorkTask(WellAttributeEditorViewModel.DockPaneId, WellModel.IsWellNameCorrect)
             {
                 Title = "Well Name correct"
             });
-            wellWork.Items.Add(new WorkTask(WellAttributeEditorViewModel.PaneId, WellModel.IsWellAttributesComplete)
+            wellWork.Items.Add(new WorkTask(WellAttributeEditorViewModel.DockPaneId, WellModel.IsWellAttributesComplete)
             {
                 Title = "Populate attributes"
             });
 
             // Well Task: Well Inspection
-            var wellInspectionWork = new WorkTask(WellAttributeEditorViewModel.PaneId)
+            var wellInspectionWork = new WorkTask(WellAttributeEditorViewModel.DockPaneId)
             {
                 Title = "Inspection"
             };
-            wellInspectionWork.Items.Add(new WorkTask(WellAttributeEditorViewModel.PaneId, WellInspectionModel.IsInspectionAttributesComplete)
+            wellInspectionWork.Items.Add(new WorkTask(WellAttributeEditorViewModel.DockPaneId, WellInspectionModel.IsInspectionAttributesComplete)
             {
                 Title = "Populate attributes"
             });
@@ -307,11 +321,11 @@ namespace UIC_Edit_Workflow
             uicTaskRoot.Items.Add(wellWork); // Add task to root task
 
             // Authorization Task
-            var authWork = new WorkTask(WellAttributeEditorViewModel.PaneId)
+            var authWork = new WorkTask(WellAttributeEditorViewModel.DockPaneId)
             {
                 Title = "Authorizations"
             };
-            authWork.Items.Add(new WorkTask("UIC_Edit_Workflow_AuthAttributeEditor", () => true)
+            authWork.Items.Add(new WorkTask(AuthAttributeEditorViewModel.DockPaneId, () => true)
             {
                 Title = "Populate attributes"
             });
@@ -321,9 +335,9 @@ namespace UIC_Edit_Workflow
             TableTasks.Add(uicTaskRoot);
 
             //Init the dockpanes in the framework. Loads data before and refernces.
-            FrameworkApplication.DockPaneManager.Find("UIC_Edit_Workflow_WellAttributeEditor");
-            FrameworkApplication.DockPaneManager.Find("UIC_Edit_Workflow_FacilityAttributeEditor");
-            FrameworkApplication.DockPaneManager.Find("UIC_Edit_Workflow_AuthAttributeEditor");
+            FrameworkApplication.DockPaneManager.Find(WellAttributeEditorViewModel.DockPaneId);
+            FrameworkApplication.DockPaneManager.Find(FacilityAttributeEditorViewModel.DockPaneId);
+            FrameworkApplication.DockPaneManager.Find(AuthAttributeEditorViewModel.DockPaneId);
 
             AreModelsDirty = false;
             _populated = true;
@@ -346,13 +360,13 @@ namespace UIC_Edit_Workflow
         /// </summary>
         internal static void Show()
         {
-            var pane = FrameworkApplication.DockPaneManager.Find(PaneId);
+            var pane = FrameworkApplication.DockPaneManager.Find(DockPaneId);
             pane?.Activate();
         }
 
         internal static void SubRowEvent()
         {
-            var pane = FrameworkApplication.DockPaneManager.Find(PaneId) as WorkFlowPaneViewModel;
+            var pane = FrameworkApplication.DockPaneManager.Find(DockPaneId) as WorkFlowPaneViewModel;
             QueuedTask.Run(() =>
             {
                 if (MapView.Active.GetSelectedLayers().Count == 0)
