@@ -5,6 +5,7 @@ using ArcGIS.Desktop.Framework;
 using ArcGIS.Desktop.Framework.Contracts;
 using ArcGIS.Desktop.Framework.Threading.Tasks;
 using ArcGIS.Desktop.Mapping;
+using Serilog;
 using UIC_Edit_Workflow.Models;
 
 namespace UIC_Edit_Workflow {
@@ -24,6 +25,8 @@ namespace UIC_Edit_Workflow {
                                                        FrameworkApplication.FindModule("UicForkflowModule"));
 
         public static FacilityModel GetFacilityModel(MapView view = null) {
+            Log.Debug("getting/creating the facility model");
+
             var activeView = MapView.Active ?? view;
             var featureLayer = FindLayer(FacilityModel.TableName, activeView) as FeatureLayer;
 
@@ -31,6 +34,8 @@ namespace UIC_Edit_Workflow {
         }
 
         public static WellModel GetWellModel(MapView view = null) {
+            Log.Debug("getting/creating the well model");
+
             var activeView = MapView.Active ?? view;
             var featureLayer = FindLayer(WellModel.TableName, activeView) as FeatureLayer;
 
@@ -38,6 +43,8 @@ namespace UIC_Edit_Workflow {
         }
 
         public static AuthorizationModel GetAuthorizationModel(MapView view = null) {
+            Log.Debug("getting/creating the authorization model");
+
             var activeView = MapView.Active ?? view;
             var standaloneTable = FindTable(AuthorizationModel.TableName, activeView);
 
@@ -45,6 +52,8 @@ namespace UIC_Edit_Workflow {
         }
 
         public static FacilityInspectionModel GetFacilityInspectionModel(MapView view = null) {
+            Log.Debug("getting/creating the facility inspection model");
+
             var activeView = MapView.Active ?? view;
             var standaloneTable = FindTable(FacilityInspectionModel.TableName, activeView);
 
@@ -52,6 +61,8 @@ namespace UIC_Edit_Workflow {
         }
 
         public static WellInspectionModel GetWellInspectionModel(MapView view = null) {
+            Log.Debug("getting/creating the well inspection model");
+
             var activeView = MapView.Active ?? view;
             var standaloneTable = FindTable(WellInspectionModel.TableName, activeView);
 
@@ -59,6 +70,8 @@ namespace UIC_Edit_Workflow {
         }
 
         public static BasicFeatureLayer FindLayer(string layerName, MapView activeView) {
+            Log.Verbose("finding feature layer {layer}", layerName);
+
             var layers = activeView.Map.GetLayersAsFlattenedList();
 
             return (BasicFeatureLayer)layers.FirstOrDefault(x => string.Equals(SplitLast(x.Name),
@@ -67,6 +80,8 @@ namespace UIC_Edit_Workflow {
         }
 
         public static StandaloneTable FindTable(string tableName, MapView activeView) {
+            Log.Verbose("finding table {layer}", tableName);
+
             var tables = activeView.Map.StandaloneTables;
 
             return tables.FirstOrDefault(x => string.Equals(SplitLast(x.Name), SplitLast(tableName),
@@ -82,6 +97,8 @@ namespace UIC_Edit_Workflow {
         }
 
         public static async Task<BasicFeatureLayer> FindLayerAsync(string layerName) => await QueuedTask.Run(() => {
+            Log.Verbose("finding feature layer async {layer}", layerName);
+
             var layers = MapView.Active?.Map.GetLayersAsFlattenedList();
 
             var specificLayer = (BasicFeatureLayer)layers?.FirstOrDefault(x => string.Equals(SplitLast(x.Name),

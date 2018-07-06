@@ -2,6 +2,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using ArcGIS.Desktop.Framework;
 using ArcGIS.Desktop.Framework.Threading.Tasks;
+using Serilog;
 using UIC_Edit_Workflow.Views;
 
 namespace UIC_Edit_Workflow
@@ -64,6 +65,8 @@ namespace UIC_Edit_Workflow
                 SetProperty(ref _isSelected, value);
                 if (_isSelected)
                 {
+                    Log.Verbose("{task} pane selected", ActivePanel);
+
                     QueuedTask.Run(() => {
                         Utils.RunOnUiThread(() =>
                         {
@@ -106,10 +109,7 @@ namespace UIC_Edit_Workflow
             return complete;
         }
 
-        public bool AreChildrenComplete()
-        {
-            return Items.All(child => child.Complete);
-        }
+        public bool AreChildrenComplete() => Items.All(child => child.Complete);
 
         public ObservableCollection<WorkTask> Items { get; set; }
     }

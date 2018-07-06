@@ -1,6 +1,6 @@
-﻿using System.Threading.Tasks;
+using System.Threading.Tasks;
 
-namespace UIC_Edit_Workflow
+namespace UIC_Edit_Workflow.Models
 {
     internal interface IWorkTaskModel
     {

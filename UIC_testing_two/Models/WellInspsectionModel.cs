@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -12,16 +12,15 @@ using ArcGIS.Desktop.Editing.Attributes;
 using ArcGIS.Desktop.Framework;
 using ArcGIS.Desktop.Framework.Threading.Tasks;
 using ArcGIS.Desktop.Mapping;
+using Serilog;
 
-namespace UIC_Edit_Workflow.Models
-{
-    internal class WellInspectionModel : ValidatableBindableBase, IWorkTaskModel
-    {
+namespace UIC_Edit_Workflow.Models {
+    internal class WellInspectionModel : ValidatableBindableBase, IWorkTaskModel {
         public const string TableName = "UICInspection";
-        public readonly StandaloneTable Table;
 
         private readonly ObservableCollection<string> _inspectionIds = new ObservableCollection<string>();
         private readonly object _lockCollection = new object();
+        public readonly StandaloneTable Table;
 
         private string _comments;
         private string _createdOn;
@@ -34,21 +33,18 @@ namespace UIC_Edit_Workflow.Models
         private string _selectedInspectionId;
         private string _wellFk;
 
-        private WellInspectionModel()
-        {
+        private WellInspectionModel() {
             InspectionIds = new ReadOnlyObservableCollection<string>(_inspectionIds);
-            Utils.RunOnUiThread(() =>
-            {
+            Utils.RunOnUiThread(() => {
                 BindingOperations.EnableCollectionSynchronization(InspectionIds, _lockCollection);
             });
         }
 
-        public WellInspectionModel(StandaloneTable standaloneTable) : this()
-        {
-            if (standaloneTable == null)
-            {
-                FrameworkApplication.AddNotification(new Notification
-                {
+        public WellInspectionModel(StandaloneTable standaloneTable) : this() {
+            if (standaloneTable == null) {
+                Log.Warning("the {TableName} layer could not be found", TableName);
+
+                FrameworkApplication.AddNotification(new Notification {
                     Message = $"The {TableName} layer could not be found. Please add it."
                 });
             }
@@ -58,14 +54,11 @@ namespace UIC_Edit_Workflow.Models
 
         public ReadOnlyObservableCollection<string> InspectionIds { get; }
 
-        public string SelectedInspectionId
-        {
+        public string SelectedInspectionId {
             get => _selectedInspectionId;
-            set
-            {
+            set {
                 SetProperty(ref _selectedInspectionId, value);
-                if (_selectedInspectionId != null)
-                {
+                if (_selectedInspectionId != null) {
                     // TODO: change to method
                     UpdateModel(_selectedInspectionId);
                 }
@@ -74,49 +67,42 @@ namespace UIC_Edit_Workflow.Models
 
         public long SelectedOid { get; set; }
 
-        public string WellFk
-        {
+        public string WellFk {
             get => _wellFk;
             set => SetProperty(ref _wellFk, value);
         }
 
-        public string InspectionId
-        {
+        public string InspectionId {
             get => _inspectionId;
             set => SetProperty(ref _inspectionId, value);
         }
 
-        public string Inspector
-        {
+        public string Inspector {
             get => _inspector;
             set => SetProperty(ref _inspector, value);
         }
 
-        public string InspectionType
-        {
+        public string InspectionType {
             get => _inspectionType;
             set => SetProperty(ref _inspectionType, value);
         }
 
-        public string InspectionDate
-        {
+        public string InspectionDate {
             get => _inspectionDate;
             set => SetProperty(ref _inspectionDate, value);
         }
 
-        public string Comments
-        {
+        public string Comments {
             get => _comments;
             set => SetProperty(ref _comments, value);
         }
 
 
-        public async Task UpdateModel(string inspectionId)
-        {
-            await QueuedTask.Run(() =>
-            {
-                if (string.IsNullOrEmpty(inspectionId))
-                {
+        public async Task UpdateModel(string inspectionId) {
+            Log.Debug("showing well inspection data for {id}", inspectionId);
+
+            await QueuedTask.Run(() => {
+                if (string.IsNullOrEmpty(inspectionId)) {
                     SelectedOid = -1;
                     WellFk = "";
                     InspectionId = "";
@@ -124,22 +110,16 @@ namespace UIC_Edit_Workflow.Models
                     InspectionType = "";
                     InspectionDate = "";
                     Comments = "";
-                }
-                else
-                {
-                    var qf = new QueryFilter
-                    {
+                } else {
+                    var qf = new QueryFilter {
                         WhereClause = $"GUID = '{inspectionId}'"
                     };
-                    using (var cursor = Table.Search(qf))
-                    {
+                    using (var cursor = Table.Search(qf)) {
                         var hasRow = cursor.MoveNext();
-                        if (!hasRow)
-                        {
+                        if (!hasRow) {
                             return;
                         }
-                        using (var row = cursor.Current)
-                        {
+                        using (var row = cursor.Current) {
                             SelectedOid = Convert.ToInt64(row["OBJECTID"]);
                             WellFk = Convert.ToString(row["Well_FK"]);
                             InspectionId = Convert.ToString(row["GUID"]);
@@ -156,44 +136,41 @@ namespace UIC_Edit_Workflow.Models
         }
 
         //Events
-        public async void ControllingIdChangedHandler(string oldGuid, string newGuid)
-        {
+        public async void ControllingIdChangedHandler(string oldGuid, string newGuid) {
+            Log.Debug("showing well inspection data for {guid}", newGuid);
+
             await AddIdsForFacility(newGuid);
             SelectedInspectionId = InspectionIds.FirstOrDefault();
         }
 
-        public Task SaveChanges()
-        {
-            return QueuedTask.Run(() =>
-            {
-                //Create list of oids to update
-                var oidSet = new List<long>
-                {
-                    SelectedOid
-                };
-                //Create edit operation and update
-                var op = new EditOperation
-                {
-                    Name = "Update Feature"
-                };
-                var insp = new Inspector();
-                insp.Load(Table, oidSet);
+        public Task SaveChanges() => QueuedTask.Run(() => {
+            Log.Debug("saving well inspection changes for {id}", SelectedOid);
 
-                insp["Well_FK"] = WellFk;
-                insp["GUID"] = InspectionId;
-                insp["Inspector"] = InspectionId;
-                insp["InspectionType"] = InspectionType;
-                insp["InspectionDate"] = InspectionDate;
-                insp["Comments"] = Comments;
+            //Create list of oids to update
+            var oidSet = new List<long> {
+                SelectedOid
+            };
 
-                op.Modify(insp);
-                op.Execute();
-                Project.Current.SaveEditsAsync();
-            });
-        }
+            //Create edit operation and update
+            var op = new EditOperation {
+                Name = "Update Feature"
+            };
+            var insp = new Inspector();
+            insp.Load(Table, oidSet);
 
-        protected override string FieldValueString()
-        {
+            insp["Well_FK"] = WellFk;
+            insp["GUID"] = InspectionId;
+            insp["Inspector"] = InspectionId;
+            insp["InspectionType"] = InspectionType;
+            insp["InspectionDate"] = InspectionDate;
+            insp["Comments"] = Comments;
+
+            op.Modify(insp);
+            op.Execute();
+            Project.Current.SaveEditsAsync();
+        });
+
+        protected override string FieldValueString() {
             var sb = new StringBuilder();
             sb.Append(Convert.ToString(InspectionId));
             sb.Append(Convert.ToString(Inspector));
@@ -204,30 +181,21 @@ namespace UIC_Edit_Workflow.Models
             return sb.ToString();
         }
 
-        public async Task AddIdsForFacility(string facilityId)
-        {
-            await QueuedTask.Run(() =>
-            {
-                _inspectionIds.Clear();
-                var qf = new QueryFilter
-                {
-                    WhereClause = $"Well_FK = '{facilityId}'"
-                };
-                using (var cursor = Table.Search(qf))
-                {
-                    while (cursor.MoveNext())
-                    {
-                        using (var row = cursor.Current)
-                        {
-                            _inspectionIds.Add(Convert.ToString(row["GUID"]));
-                        }
+        public async Task AddIdsForFacility(string facilityId) => await QueuedTask.Run(() => {
+            _inspectionIds.Clear();
+            var qf = new QueryFilter {
+                WhereClause = $"Well_FK = '{facilityId}'"
+            };
+            using (var cursor = Table.Search(qf)) {
+                while (cursor.MoveNext()) {
+                    using (var row = cursor.Current) {
+                        _inspectionIds.Add(Convert.ToString(row["GUID"]));
                     }
                 }
-            });
-        }
+            }
+        });
 
-        public bool IsInspectionAttributesComplete()
-        {
+        public bool IsInspectionAttributesComplete() {
             return !string.IsNullOrEmpty(WellFk) &&
                    !string.IsNullOrEmpty(InspectionId) &&
                    !string.IsNullOrEmpty(Inspector) &&
@@ -236,28 +204,25 @@ namespace UIC_Edit_Workflow.Models
                    !string.IsNullOrEmpty(Comments);
         }
 
-        public async void AddNew(string facilityGuid)
-        {
-            await QueuedTask.Run(() =>
-            {
-                var newGuid = Guid.NewGuid();
-                // Create dictionary of attribute names and values
-                var attributes = new Dictionary<string, object>
-                {
+        public async void AddNew(string facilityGuid) => await QueuedTask.Run(() => {
+            Log.Debug("adding new well inspection to {guid}", facilityGuid);
+
+            var newGuid = Guid.NewGuid();
+            // Create dictionary of attribute names and values
+            var attributes = new Dictionary<string, object> {
                     {"Well_FK", facilityGuid},
                     {"GUID", newGuid}
                 };
 
-                var createFeatures = new EditOperation
-                {
-                    Name = "Create Features"
-                };
-                createFeatures.Create(Table, attributes);
-                createFeatures.Execute();
-                var guidString = "{" + newGuid.ToString().ToUpper() + "}";
-                _inspectionIds.Add(guidString);
-                SelectedInspectionId = guidString;
-            });
-        }
+            var createFeatures = new EditOperation {
+                Name = "Create Features"
+            };
+            createFeatures.Create(Table, attributes);
+            createFeatures.Execute();
+            
+            var guidString = "{" + newGuid.ToString().ToUpper() + "}";
+            _inspectionIds.Add(guidString);
+            SelectedInspectionId = guidString;
+        });
     }
 }

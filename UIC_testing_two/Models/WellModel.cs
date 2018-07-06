@@ -13,12 +13,11 @@ using ArcGIS.Desktop.Editing.Attributes;
 using ArcGIS.Desktop.Framework;
 using ArcGIS.Desktop.Framework.Threading.Tasks;
 using ArcGIS.Desktop.Mapping;
+using Serilog;
 using UIC_Edit_Workflow.Validations;
 
-namespace UIC_Edit_Workflow.Models
-{
-    internal class WellModel : ValidatableBindableBase, IWorkTaskModel
-    {
+namespace UIC_Edit_Workflow.Models {
+    internal class WellModel : ValidatableBindableBase, IWorkTaskModel {
         public const string IdField = "WellID";
         public const string TableName = "UICWell";
 
@@ -56,18 +55,14 @@ namespace UIC_Edit_Workflow.Models
 
         private string _wellSwpz;
 
-        private WellModel()
-        {
+        private WellModel() {
             WellIds = new ReadOnlyObservableCollection<string>(_facilityWellIds);
             Utils.RunOnUiThread(() => { BindingOperations.EnableCollectionSynchronization(WellIds, _lockCollection); });
         }
 
-        public WellModel(FeatureLayer featureLayer) : this()
-        {
-            if (featureLayer == null)
-            {
-                FrameworkApplication.AddNotification(new Notification
-                {
+        public WellModel(FeatureLayer featureLayer) : this() {
+            if (featureLayer == null) {
+                FrameworkApplication.AddNotification(new Notification {
                     Message = $"The {TableName} layer could not be found. Please add it."
                 });
             }
@@ -76,15 +71,12 @@ namespace UIC_Edit_Workflow.Models
 
         public ReadOnlyObservableCollection<string> WellIds { get; }
 
-        public string SelectedWellId
-        {
+        public string SelectedWellId {
             get => _selectedWellId;
 
-            set
-            {
+            set {
                 SetProperty(ref _selectedWellId, value);
-                if (_selectedWellId != null)
-                {
+                if (_selectedWellId != null) {
                     // TODO change to method
                     UpdateModel(_selectedWellId);
                 }
@@ -94,81 +86,70 @@ namespace UIC_Edit_Workflow.Models
         public long SelectedOid { get; set; }
 
         [Required]
-        public string WellId
-        {
+        public string WellId {
             get => _wellId;
             set => SetProperty(ref _wellId, value);
         }
 
         [Required]
         [UicValidations(ErrorMessage = "{0} is not correct")]
-        public string WellName
-        {
+        public string WellName {
             get => _wellName;
             set => SetProperty(ref _wellName, value);
         }
 
         [Required]
-        public string WellClass
-        {
+        public string WellClass {
             get => _wellClass;
             set => SetProperty(ref _wellClass, value);
         }
 
         [Required]
-        public string WellSubClass
-        {
+        public string WellSubClass {
             get => _wellSubClass;
             set => SetProperty(ref _wellSubClass, value);
         }
 
         [Required]
-        public string HighPriority
-        {
+        public string HighPriority {
             get => _highPriority;
             set => SetProperty(ref _highPriority, value);
         }
 
         [Required]
-        public string WellSwpz
-        {
+        public string WellSwpz {
             get => _wellSwpz;
             set => SetProperty(ref _wellSwpz, value);
         }
 
         [Required]
-        public string LocationMethod
-        {
+        public string LocationMethod {
             get => _locationMethod;
             set => SetProperty(ref _locationMethod, value);
         }
 
         [Required]
-        public string LocationAccuracy
-        {
+        public string LocationAccuracy {
             get => _locationAccuracy;
             set => SetProperty(ref _locationAccuracy, value);
         }
 
-        public string Comments
-        {
+        public string Comments {
             get => _comments;
             set => SetProperty(ref _comments, value);
         }
 
-        public string WellGuid
-        {
+        public string WellGuid {
             get => _wellGuid;
             set => SetProperty(ref _wellGuid, value);
         }
 
-        public async Task UpdateModel(string wellId)
-        {
+        public async Task UpdateModel(string wellId) {
+            Log.Debug("showing well data for {id}", wellId);
+
             var oldWellGuid = WellGuid;
-            await QueuedTask.Run(() =>
-            {
-                if (string.IsNullOrEmpty(wellId))
-                {
+            await QueuedTask.Run(() => {
+                if (string.IsNullOrEmpty(wellId)) {
                     SelectedOid = -1;
                     WellId = "";
                     WellName = "";
@@ -180,23 +161,17 @@ namespace UIC_Edit_Workflow.Models
                     LocationAccuracy = "";
                     Comments = "";
                     WellGuid = "";
-                }
-                else
-                {
-                    var qf = new QueryFilter
-                    {
+                } else {
+                    var qf = new QueryFilter {
                         WhereClause = $"WellID = '{wellId}'"
                     };
-                    using (var cursor = FeatureLayer.Search(qf))
-                    {
+                    using (var cursor = FeatureLayer.Search(qf)) {
                         var hasRow = cursor.MoveNext();
-                        if (!hasRow)
-                        {
+                        if (!hasRow) {
                             return;
                         }
 
-                        using (var row = cursor.Current)
-                        {
+                        using (var row = cursor.Current) {
                             SelectedOid = Convert.ToInt64(row["OBJECTID"]);
                             WellId = Convert.ToString(row["WellID"]);
                             WellName = Convert.ToString(row["WellName"]);
@@ -217,106 +192,90 @@ namespace UIC_Edit_Workflow.Models
             WellChanged(oldWellGuid, WellGuid);
         }
 
-        public Task SaveChanges()
-        {
-            return QueuedTask.Run(() =>
-            {
-                //Create list of oids to update
-                var oidSet = new List<long>
-                {
-                    SelectedOid
-                };
-                //Create edit operation and update
-                var op = new EditOperation
-                {
-                    Name = "Update Feature"
-                };
-                var insp = new Inspector();
-                insp.Load(FeatureLayer, oidSet);
+        public Task SaveChanges() => QueuedTask.Run(() => {
+            Log.Debug("saving well changes for {id}", SelectedOid);
 
-                insp["WellName"] = WellName;
-                insp["WellClass"] = WellClass;
-                insp["WellSubClass"] = WellSubClass;
-                insp["HighPriority"] = HighPriority;
-                insp["WellSWPZ"] = WellSwpz;
-                insp["LocationMethod"] = LocationMethod;
-                insp["LocationAccuracy"] = LocationAccuracy;
+            //Create list of oids to update
+            var oidSet = new List<long> {
+                SelectedOid
+            };
+            //Create edit operation and update
+            var op = new EditOperation {
+                Name = "Update Feature"
+            };
+            var insp = new Inspector();
+            insp.Load(FeatureLayer, oidSet);
 
-                op.Modify(insp);
-                op.Execute();
-                Project.Current.SaveEditsAsync();
-            });
-        }
+            insp["WellName"] = WellName;
+            insp["WellClass"] = WellClass;
+            insp["WellSubClass"] = WellSubClass;
+            insp["HighPriority"] = HighPriority;
+            insp["WellSWPZ"] = WellSwpz;
+            insp["LocationMethod"] = LocationMethod;
+            insp["LocationAccuracy"] = LocationAccuracy;
 
-        public async void ControllingIdChangedHandler(string oldId, string facGuid)
-        {
+            op.Modify(insp);
+            op.Execute();
+            Project.Current.SaveEditsAsync();
+        });
+
+        public async void ControllingIdChangedHandler(string oldId, string facGuid) {
+            Log.Debug("showing well data for {guid}", facGuid);
+
             await AddIdsForFacility(facGuid);
             SelectedWellId = WellIds.FirstOrDefault();
         }
 
         public event ControllingIdChangeDelegate WellChanged;
 
-        public async Task AddIdsForFacility(string facilityId)
-        {
-            await QueuedTask.Run(() =>
-            {
-                _facilityWellIds.Clear();
-                var qf = new QueryFilter
-                {
-                    WhereClause = $"Facility_FK = '{facilityId}'"
-                };
-                using (var cursor = FeatureLayer.Search(qf))
-                {
-                    while (cursor.MoveNext())
-                    {
-                        using (var row = cursor.Current)
-                        {
-                            _facilityWellIds.Add(Convert.ToString(row[IdField]));
-                        }
+        public async Task AddIdsForFacility(string facilityId) => await QueuedTask.Run(() => {
+            _facilityWellIds.Clear();
+            var qf = new QueryFilter {
+                WhereClause = $"Facility_FK = '{facilityId}'"
+            };
+            using (var cursor = FeatureLayer.Search(qf)) {
+                while (cursor.MoveNext()) {
+                    using (var row = cursor.Current) {
+                        _facilityWellIds.Add(Convert.ToString(row[IdField]));
                     }
                 }
-            });
-        }
+            }
+        });
 
-        public async void AddNew(long objectId, string facilityGuid, string countyFips)
-        {
-            await QueuedTask.Run(() =>
-            {
-                //Create list contianing the new well OID
-                var oidSet = new List<long>
-                {
+        public async void AddNew(long objectId, string facilityGuid, string countyFips) => await QueuedTask.Run(() => {
+            Log.Debug("adding new well to {guid}", facilityGuid);
+
+            //Create list contianing the new well OID
+            var oidSet = new List<long> {
                     objectId
                 };
-                //Create edit operation and update
-                var op = new EditOperation
-                {
-                    Name = "Update date"
-                };
-                var insp = new Inspector();
-                insp.Load(FeatureLayer, oidSet);
+            //Create edit operation and update
+            var op = new EditOperation {
+                Name = "Update date"
+            };
+            var insp = new Inspector();
+            insp.Load(FeatureLayer, oidSet);
 
-                long.TryParse(countyFips, out long fips);
+            long.TryParse(countyFips, out var fips);
 
-                insp["Facility_FK"] = facilityGuid;
+            insp["Facility_FK"] = facilityGuid;
 
-                var newGuid = Guid.NewGuid();
-                var guidLast8 = newGuid.ToString();
-                guidLast8 = guidLast8.Substring(guidLast8.Length - 8);
-                insp["GUID"] = newGuid;
+            var newGuid = Guid.NewGuid();
+            var guidLast8 = newGuid.ToString();
+            guidLast8 = guidLast8.Substring(guidLast8.Length - 8);
+            insp["GUID"] = newGuid;
 
-                var newWellId = $"UTU{countyFips.Substring(countyFips.Length - 2)}{insp["WellClass"]}{guidLast8}"
-                    .ToUpper();
-                insp[IdField] = newWellId;
+            var newWellId = $"UTU{countyFips.Substring(countyFips.Length - 2)}{insp["WellClass"]}{guidLast8}"
+                .ToUpper();
+            insp[IdField] = newWellId;
 
-                op.Modify(insp);
-                op.Execute();
-                _facilityWellIds.Add(newWellId);
-                SelectedWellId = newWellId;
-            });
-        }
+            op.Modify(insp);
+            op.Execute();
+            _facilityWellIds.Add(newWellId);
+            SelectedWellId = newWellId;
+        });
 
-        public bool IsWellAttributesComplete()
-        {
+        public bool IsWellAttributesComplete() {
             return !string.IsNullOrEmpty(WellId) &&
                    !string.IsNullOrEmpty(WellName) &&
                    !string.IsNullOrEmpty(WellClass) &&
@@ -325,15 +284,13 @@ namespace UIC_Edit_Workflow.Models
                    !string.IsNullOrEmpty(WellSwpz);
         }
 
-        public bool IsWellNameCorrect()
-        {
+        public bool IsWellNameCorrect() {
             var isWellNameError = GetErrors("WellName") == null;
 
             return !string.IsNullOrEmpty(WellName) && isWellNameError;
         }
 
-        protected override string FieldValueString()
-        {
+        protected override string FieldValueString() {
             var sb = new StringBuilder();
             sb.Append(Convert.ToString(WellId));
             sb.Append(Convert.ToString(WellName));

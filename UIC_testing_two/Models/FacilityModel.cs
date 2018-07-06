@@ -9,6 +9,7 @@ using ArcGIS.Desktop.Editing;
 using ArcGIS.Desktop.Editing.Attributes;
 using ArcGIS.Desktop.Framework.Threading.Tasks;
 using ArcGIS.Desktop.Mapping;
+using Serilog;
 using UIC_Edit_Workflow.Validations;
 
 namespace UIC_Edit_Workflow.Models {
@@ -117,6 +118,9 @@ namespace UIC_Edit_Workflow.Models {
                 return;
             }
 
+            Log.Debug("showing facility data for {id}", facilityId);
+
+
             var oldFacId = FacilityGuid;
             await QueuedTask.Run(() => {
                 var qf = new QueryFilter {
@@ -149,6 +153,8 @@ namespace UIC_Edit_Workflow.Models {
         }
 
         public Task SaveChanges() => QueuedTask.Run(() => {
+            Log.Debug("saving facility changes for {guid}", SelectedOid);
+
             //Create list of oids to update
             var oidSet = new List<long> {
                 SelectedOid
@@ -181,6 +187,8 @@ namespace UIC_Edit_Workflow.Models {
 
         //Events
         public async void ControllingIdChangedHandler(string oldId, string facGuid) {
+            Log.Debug("showing facility data for {guid}", facGuid);
+
             await UpdateModel(facGuid);
         }
 

@@ -8,21 +8,19 @@ using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace UIC_Edit_Workflow.Models
-{
-    internal class ValidatableBindableBase : BindableBase, INotifyDataErrorInfo
-    {
-        protected ValidatableBindableBase()
-        {
+namespace UIC_Edit_Workflow.Models {
+    internal class ValidatableBindableBase : BindableBase, INotifyDataErrorInfo {
+        private readonly Dictionary<string, List<string>> _errors = new Dictionary<string, List<string>>();
+
+        protected ValidatableBindableBase() {
             LoadHash = CalculateFieldHash();
         }
-        private readonly Dictionary<string, List<string>> _errors = new Dictionary<string, List<string>>();
+
+        public string LoadHash { get; set; }
         public event EventHandler<DataErrorsChangedEventArgs> ErrorsChanged;
 
-        public IEnumerable GetErrors(string propertyName)
-        {
-            if (_errors.ContainsKey(propertyName))
-            {
+        public IEnumerable GetErrors(string propertyName) {
+            if (_errors.ContainsKey(propertyName)) {
                 return _errors[propertyName];
             }
 
@@ -31,42 +29,32 @@ namespace UIC_Edit_Workflow.Models
 
         public bool HasErrors => _errors.Count > 0;
 
-        protected override void SetProperty<T>(ref T member, T val, [CallerMemberName] string propertyName = null)
-        {
+        protected override void SetProperty<T>(ref T member, T val, [CallerMemberName] string propertyName = null) {
             ValidateProperty(propertyName, val);
             base.SetProperty(ref member, val, propertyName);
         }
 
-        private void ValidateProperty<T>(string propertyName, T value)
-        {
+        private void ValidateProperty<T>(string propertyName, T value) {
             var results = new List<ValidationResult>();
-            var context = new ValidationContext(this)
-            {
+            var context = new ValidationContext(this) {
                 MemberName = propertyName
             };
             Validator.TryValidateProperty(value, context, results);
 
-            if (results.Any())
-            {
+            if (results.Any()) {
                 _errors[propertyName] = results.Select(c => c.ErrorMessage).ToList();
-            }
-            else
-            {
+            } else {
                 _errors.Remove(propertyName);
             }
 
             ErrorsChanged?.Invoke(this, new DataErrorsChangedEventArgs(propertyName));
         }
 
-        public string LoadHash { get; set; }
-
-        protected virtual string FieldValueString()
-        {
+        protected virtual string FieldValueString() {
             throw new NotImplementedException("not yet implemented");
         }
 
-        protected string CalculateFieldHash()
-        {
+        protected string CalculateFieldHash() {
             var fieldString = FieldValueString();
             // step 1, calculate MD5 hash from input
 
@@ -77,16 +65,14 @@ namespace UIC_Edit_Workflow.Models
             // step 2, convert byte array to hex string
             var sb = new StringBuilder();
 
-            foreach (var t in hash)
-            {
+            foreach (var t in hash) {
                 sb.Append(t.ToString("X2"));
             }
 
             return sb.ToString();
         }
 
-        public bool HasModelChanged()
-        {
+        public bool HasModelChanged() {
             return !LoadHash.Equals(CalculateFieldHash());
         }
     }

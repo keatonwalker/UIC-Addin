@@ -3,7 +3,11 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
+using System.Net.Mail;
+using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using ArcGIS.Core.Data;
@@ -19,6 +23,9 @@ using ArcGIS.Desktop.Framework.Dialogs;
 using ArcGIS.Desktop.Framework.Threading.Tasks;
 using ArcGIS.Desktop.Mapping;
 using ArcGIS.Desktop.Mapping.Events;
+using Serilog;
+using Serilog.Events;
+using Serilog.Sinks.Email;
 using UIC_Edit_Workflow.Models;
 using UIC_Edit_Workflow.Views;
 
@@ -50,6 +57,29 @@ namespace UIC_Edit_Workflow {
 
         public WorkFlowPaneViewModel() {
             TableTasks = new ObservableCollection<WorkTask>();
+            var myDocs = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+            var arcGisProLocation = Path.Combine(myDocs, "ArcGIS", "AddIns", "ArcGISPro");
+
+            var attribute = (GuidAttribute)Assembly.GetExecutingAssembly().GetCustomAttributes(typeof(GuidAttribute), true)[0];
+            var proAddinFolder = $"{{{attribute.Value}}}";
+
+            var addinFolder = Path.Combine(arcGisProLocation, proAddinFolder, "{Date}-log.txt");
+
+            var email = new EmailConnectionInfo {
+                EmailSubject = "UIC Addin",
+                FromEmail = "noreply@utah.gov",
+                ToEmail = "kwalker@utah.gov",
+                MailServer = "send.state.ut.us",
+                Port = 25
+            };
+
+            Log.Logger = new LoggerConfiguration()
+                .WriteTo.Email(email, restrictedToMinimumLevel: LogEventLevel.Error)
+                .WriteTo.RollingFile(addinFolder, retainedFileCountLimit: 7)
+                .MinimumLevel.Verbose()
+                .CreateLogger();
+
+            Log.Debug("Logging Initialized");
 
             if (MapView.Active == null) {
                 _initializedEvent = MapViewInitializedEvent.Subscribe(args => Init(args.MapView));
@@ -315,6 +345,8 @@ namespace UIC_Edit_Workflow {
         ///     Show the DockPane.
         /// </summary>
         internal static void Show() {
+            Log.Verbose("showing pane {id}", DockPaneId);
+
             var pane = FrameworkApplication.DockPaneManager.Find(DockPaneId);
             pane?.Activate();
         }
@@ -390,6 +422,8 @@ namespace UIC_Edit_Workflow {
         });
 
         private async void CheckForSugestion(string partialId) => await QueuedTask.Run(() => {
+            Log.Debug("looking for suggestions for {id}", partialId);
+
             var suggestedId = "";
             var rowCount = 0;
             var qf = new QueryFilter {
@@ -415,6 +449,8 @@ namespace UIC_Edit_Workflow {
         });
 
         private Task GetSelectedFeature() {
+            Log.Debug("looking for selected feature");
+
             var t = QueuedTask.Run(async () => {
                 string selectedId;
                 string countyFips;
@@ -528,17 +564,20 @@ namespace UIC_Edit_Workflow {
                 }
             }
             var oidSet = new List<long> {
-                    SelectedOid
-                };
+                SelectedOid
+            };
+
             //Create edit operation and update
             var op = new EditOperation {
-                Name = "Update fips"
+                Name = "Update fips",
+                ShowProgressor = true
             };
+
             var insp = new Inspector();
             insp.Load(SelectedLayer, oidSet);
             insp["CountyFIPS"] = SelectedFips;
-            await insp.ApplyAsync();
 
+            await insp.ApplyAsync();
             await Project.Current.SaveEditsAsync();
         });
 

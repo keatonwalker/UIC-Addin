@@ -8,9 +8,7 @@
     <Author>kwalker</Author>
     <Company>Microsoft</Company>
     <Date>10/16/2017 1:04:42 PM, 2017</Date>
-    <Subject>Framework</Subject>
-    <!-- Note subject can be one or more of these topics:
-                    Content, Framework, Editing, Geodatabase, Geometry, Geoprocessing, Layouts, Map Authoring, Map Exploration -->
+    <Subject>Editing</Subject>
   </AddInInfo>
   <modules>
     <insertModule id="UicForkflowModule" className="UicWorkflowModule" condition="esri_core_MapPane" autoLoad="false"
@@ -27,9 +25,6 @@
         <group id="UIC_Edit_Workflow_Group1" caption="Group 1" keytip="UIC Workflow" appearsOnAddInTab="true">
           <!-- host controls within groups -->
           <button refID="WorkflowPane_ShowButton" size="large" />
-          <!--<button refID="UIC_Edit_Workflow_AttributeEditor_ShowButton" size="large" />
-          <button refID="WellAttributeEditorPane_ShowButton" size="large" />
-          <button refID="AuthAttributeEditorPane_ShowButton" size="large" />-->
         </group>
       </groups>
       <controls>
@@ -41,18 +36,6 @@
             Show Workflow<disabledText />
           </tooltip>
         </button>
-        <!--<button id="UIC_Edit_Workflow_AttributeEditor_ShowButton" caption="Show Facility Attributes" className="AttributeEditor_ShowButton" loadOnClick="true" smallImage="Images\GenericButtonPurple16.png" largeImage="Images\GenericButtonPurple32.png">
-          <tooltip heading="Show Dockpane">Show attribute editor<disabledText /></tooltip>
-        </button>-->
-        <!--<button id="WellAttributeEditorPane_ShowButton" caption="Show Well Attributes" className="WellAttributeEditor_ShowButton" loadOnClick="true" smallImage="Images\GenericButtonPurple16.png" largeImage="Images\GenericButtonPurple32.png">
-          <tooltip heading="Show Dockpane">Show Dockpane<disabledText /></tooltip>
-        </button>-->
-        <!--<button id="AuthAttributeEditorPane_ShowButton" caption="Show AuthAttributeEditor" className="AuthAttributeEditor_ShowButton" loadOnClick="true" smallImage="Images\GenericButtonPurple16.png" largeImage="Images\GenericButtonPurple32.png">
-          <tooltip heading="Show Dockpane">Show Dockpane<disabledText /></tooltip>
-        </button>-->
-        <!--        <button keytip="hi" id="UIC_Edit_Workflow_Views_TestDockPane_ShowButton" caption="Show TestDockPane" className="UIC_Edit_Workflow.Views.TestDockPane_ShowButton" loadOnClick="true" smallImage="Images\GenericButtonPurple16.png" largeImage="Images\GenericButtonPurple32.png">-->
-        <!--          <tooltip heading="Show Dockpane">Show Dockpane<disabledText /></tooltip>-->
-        <!--        </button>-->
       </controls>
       <dockPanes>
         <dockPane id="WorkflowPane" caption="UIC Workflow" className="UIC_Edit_Workflow.WorkFlowPaneViewModel"

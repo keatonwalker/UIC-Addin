@@ -85,8 +85,5 @@ csharp_space_between_method_call_empty_parameter_list_parentheses = false
 csharp_preserve_single_line_statements = false
 csharp_preserve_single_line_blocks = true
 
-
-
-[*.xaml]
+[*.{xaml,daml}]
 indent_size = 2
-
