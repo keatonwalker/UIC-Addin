@@ -1,202 +1,188 @@
-﻿<UserControl x:Class="UIC_Edit_Workflow.WellAttributeEditorView"
+<UserControl x:Class="UIC_Edit_Workflow.Views.WellAttributeEditorView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"   
-             xmlns:ui="clr-namespace:UIC_Edit_Workflow"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:extensions="clr-namespace:ArcGIS.Desktop.Extensions;assembly=ArcGIS.Desktop.Extensions"
-             mc:Ignorable="d" 
-             d:DesignHeight="300" d:DesignWidth="300"
-             d:DataContext="{Binding Path=ui.WellAttributeEditorViewModel}">
-     <UserControl.Resources>
-        <ResourceDictionary>
-            <ResourceDictionary.MergedDictionaries>
-                <extensions:DesignOnlyResourceDictionary Source="pack://application:,,,/ArcGIS.Desktop.Framework;component\Themes\Default.xaml"/>
-            </ResourceDictionary.MergedDictionaries>
-            
-            <BooleanToVisibilityConverter x:Key="boolToVis" />
+             mc:Ignorable="d"
+             d:DesignHeight="300"
+             d:DesignWidth="300"
+             d:DataContext="{Binding WellAttributeEditorViewModel}">
+  <UserControl.Resources>
+    <ResourceDictionary>
+      <ResourceDictionary.MergedDictionaries>
+        <extensions:DesignOnlyResourceDictionary
+          Source="pack://application:,,,/ArcGIS.Desktop.Framework;component\Themes\Default.xaml" />
+      </ResourceDictionary.MergedDictionaries>
 
-            <Style TargetType="TextBox">
-                <Style.Triggers>
-                    <Trigger Property="Validation.HasError"
-                             Value="true">
-                        <Setter Property="ToolTip"
-                                Value="{Binding RelativeSource={x:Static RelativeSource.Self},
-                             Path=(Validation.Errors).CurrentItem.ErrorContent}"/>
-                    </Trigger>
-                </Style.Triggers>
-            </Style>
-        </ResourceDictionary>
-    </UserControl.Resources>
-    <Grid Opacity="1.0">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-        </Grid.RowDefinitions>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*"/>
-        </Grid.ColumnDefinitions>
-        <Grid Margin="0,0,0,0">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-            </Grid.RowDefinitions>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="2*"/>
-            </Grid.ColumnDefinitions>
+      <BooleanToVisibilityConverter x:Key="BoolToVis" />
+      <Style TargetType="TextBox">
+        <Style.Triggers>
+          <Trigger Property="Validation.HasError"
+                   Value="true">
+            <Setter Property="ToolTip" Value="HI" />
+          </Trigger>
+        </Style.Triggers>
+      </Style>
+    </ResourceDictionary>
+  </UserControl.Resources>
+  <Grid Opacity="1.0">
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="Auto" />
+    </Grid.RowDefinitions>
+    <Grid.ColumnDefinitions>
+      <ColumnDefinition Width="*" />
+    </Grid.ColumnDefinitions>
+    <Grid Margin="0,0,0,0">
+      <Grid.RowDefinitions>
+        <RowDefinition Height="Auto" />
+        <RowDefinition Height="Auto" />
+        <RowDefinition Height="Auto" />
+        <RowDefinition Height="Auto" />
+        <RowDefinition Height="Auto" />
+        <RowDefinition Height="Auto" />
+        <RowDefinition Height="Auto" />
+        <RowDefinition Height="Auto" />
+        <RowDefinition Height="Auto" />
+        <RowDefinition Height="Auto" />
+        <RowDefinition Height="Auto" />
+      </Grid.RowDefinitions>
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="Auto" />
+        <ColumnDefinition Width="2*" />
+      </Grid.ColumnDefinitions>
 
-            <StackPanel Orientation="Horizontal" Grid.Row="0" Grid.ColumnSpan="2" Visibility="{Binding NewWellSelected, Converter={StaticResource boolToVis}}">
-                <Button HorizontalAlignment="Right" Margin="5" Content="Add Selected Point" Command="{Binding AddWell}"/>
-                <TextBlock Margin="5" FontWeight="Bold" Foreground="Red"><Run Text="Well Class:"/></TextBlock>
-                <TextBox Text="{Binding NewWellClass, UpdateSourceTrigger=PropertyChanged}" Margin ="5,5,5,10" Width="84" ToolTip="Enter County FIPS"/>
-            </StackPanel>
+      <StackPanel Orientation="Horizontal" Grid.Row="0" Grid.ColumnSpan="2"
+                  Visibility="{Binding NewWellSelected, Converter={StaticResource BoolToVis}}">
+        <Button HorizontalAlignment="Right" Margin="5" Content="Add Selected Point" />
+        <TextBlock Margin="5" FontWeight="Bold" Foreground="Red">
+          <Run Text="Well Class:" />
+        </TextBlock>
+        <TextBox Margin="5,5,5,10" Width="84" ToolTip="Enter County FIPS" />
+      </StackPanel>
 
-            <ComboBox  Grid.Row="1" Grid.Column="1" SelectedItem="{Binding Source={x:Static ui:WellModel.Instance}, Path=SelectedWellId, Mode=TwoWay}" Margin="5"
-                      ItemsSource="{Binding Source={x:Static ui:WellModel.Instance}, Path=WellIds, Mode=OneWay}" ></ComboBox>
-            <TextBlock Grid.Row="2" 
-                       HorizontalAlignment="Right" Margin="5" 
-                       Text="WellId"/>
-            <TextBox Grid.Row="2" Grid.Column="1" 
-                     Height="20" HorizontalAlignment="Stretch" Margin="5" 
-                     Text="{Binding Source={x:Static ui:WellModel.Instance}, Path=WellId,
-                 ValidatesOnDataErrors=True}"/>
-            <TextBlock Grid.Row="3" 
-                       HorizontalAlignment="Right" Margin="5" 
-                       Text="WellName"/>
-            <TextBox Grid.Row="3" Grid.Column="1" 
-                     Height="20" HorizontalAlignment="Stretch" Margin="5" 
-                     Text="{Binding Source={x:Static ui:WellModel.Instance}, Path=WellName,
-                ValidatesOnDataErrors=True}"/>
-            <TextBlock Grid.Row="4" 
-                       HorizontalAlignment="Right" Margin="5" 
-                       Text="WellClass"/>
-            <TextBox Grid.Row="4" Grid.Column="1" 
-                     Height="20" HorizontalAlignment="Stretch" Margin="5" 
-                     Text="{Binding Source={x:Static ui:WellModel.Instance}, Path=WellClass,
-                ValidatesOnDataErrors=True}"/>
-            <TextBlock Grid.Row="5" 
-                       HorizontalAlignment="Right" Margin="5" 
-                       Text="WellSubClass"/>
-            <TextBox Grid.Row="5" Grid.Column="1" 
-                     Height="20" HorizontalAlignment="Stretch" Margin="5" 
-                     Text="{Binding Source={x:Static ui:WellModel.Instance}, Path=WellSubClass,
-                ValidatesOnDataErrors=True}"/>
-            <TextBlock Grid.Row="6" 
-                       HorizontalAlignment="Right" Margin="5" 
-                       Text="HighPriority"/>
-            <TextBox Grid.Row="6" Grid.Column="1" 
-                     Height="20" HorizontalAlignment="Stretch" Margin="5" 
-                     Text="{Binding Source={x:Static ui:WellModel.Instance}, Path=HighPriority,
-                ValidatesOnDataErrors=True}"/>
-            <TextBlock Grid.Row="7" 
-                       HorizontalAlignment="Right" Margin="5" 
-                       Text="WellSWPZ"/>
-            <TextBox Grid.Row="7" Grid.Column="1" 
-                     Height="20" HorizontalAlignment="Stretch" Margin="5" 
-                     Text="{Binding Source={x:Static ui:WellModel.Instance}, Path=WellSwpz,
-                ValidatesOnDataErrors=True}"/>
-            <TextBlock Grid.Row="8" 
-                       HorizontalAlignment="Right" Margin="5" 
-                       Text="LocationMethod"/>
-            <TextBox Grid.Row="8" Grid.Column="1" 
-                     Height="20" HorizontalAlignment="Stretch" Margin="5" 
-                     Text="{Binding Source={x:Static ui:WellModel.Instance}, Path=LocationMethod,
-                ValidatesOnDataErrors=True}"/>
-            <TextBlock Grid.Row="9" 
-                       HorizontalAlignment="Right" Margin="5" 
-                       Text="LocationAccuracy"/>
-            <TextBox Grid.Row="9" Grid.Column="1" 
-                     Height="20" HorizontalAlignment="Stretch" Margin="5" 
-                     Text="{Binding Source={x:Static ui:WellModel.Instance}, Path=LocationAccuracy,
-                ValidatesOnDataErrors=True}"/>
-            <TextBlock Grid.Row="10" 
-                       HorizontalAlignment="Right" Margin="5" 
-                       Text="Comments"/>
-            <TextBox Grid.Row="10" Grid.Column="1" 
-                     Height="20" HorizontalAlignment="Stretch" Margin="5" 
-                     Text="{Binding Source={x:Static ui:WellModel.Instance}, Path=Comments,
-                ValidatesOnDataErrors=True}"/>
+      <ComboBox Grid.Row="1" Grid.Column="1" Margin="5"
+                SelectedItem="{Binding Model.SelectedWellId, Mode=TwoWay}"
+                ItemsSource="{Binding Model.WellIds, Mode=OneWay}"/>
 
-        </Grid>
-        <GridSplitter HorizontalAlignment="Stretch"
+      <TextBlock Grid.Row="2" Grid.Column="0"
+                 HorizontalAlignment="Right" Margin="5"
+                 Text="WellId" />
+      <TextBox Grid.Row="2" Grid.Column="1"
+               Height="20" HorizontalAlignment="Stretch" Margin="5" 
+               Text="{Binding Model.WellId, ValidatesOnDataErrors=True}"/>
+      <TextBlock Grid.Row="3" Grid.Column="0"
+                 HorizontalAlignment="Right" Margin="5"
+                 Text="WellName" />
+      <TextBox Grid.Row="3" Grid.Column="1"
+               Height="20" HorizontalAlignment="Stretch" Margin="5" 
+               Text="{Binding Model.WellName, ValidatesOnDataErrors=True}"/>
+      <TextBlock Grid.Row="4" Grid.Column="0"
+                 HorizontalAlignment="Right" Margin="5"
+                 Text="WellClass" />
+      <TextBox Grid.Row="4" Grid.Column="1"
+               Height="20" HorizontalAlignment="Stretch" Margin="5" 
+               Text="{Binding Model.WellClass, ValidatesOnDataErrors=True}"/>
+      <TextBlock Grid.Row="5" Grid.Column="0"
+                 HorizontalAlignment="Right" Margin="5"
+                 Text="WellSubClass" />
+      <TextBox Grid.Row="5" Grid.Column="1"
+               Height="20" HorizontalAlignment="Stretch" Margin="5" 
+               Text="{Binding Model.WellSubClass, ValidatesOnDataErrors=True}"/>
+      <TextBlock Grid.Row="6" Grid.Column="0"
+                 HorizontalAlignment="Right" Margin="5"
+                 Text="HighPriority" />
+      <TextBox Grid.Row="6" Grid.Column="1"
+               Height="20" HorizontalAlignment="Stretch" Margin="5" 
+               Text="{Binding Model.HighPriority, ValidatesOnDataErrors=True}"/>
+      <TextBlock Grid.Row="7" Grid.Column="0"
+                 HorizontalAlignment="Right" Margin="5"
+                 Text="WellSWPZ" />
+      <TextBox Grid.Row="7" Grid.Column="1"
+               Height="20" HorizontalAlignment="Stretch" Margin="5" 
+               Text="{Binding Model.WellSWPZ, ValidatesOnDataErrors=True}"/>
+      <TextBlock Grid.Row="8" Grid.Column="0"
+                 HorizontalAlignment="Right" Margin="5"
+                 Text="LocationMethod" />
+      <TextBox Grid.Row="8" Grid.Column="1"
+               Height="20" HorizontalAlignment="Stretch" Margin="5" 
+               Text="{Binding Model.LocationMethod, ValidatesOnDataErrors=True}"/>
+      <TextBlock Grid.Row="9" Grid.Column="0"
+                 HorizontalAlignment="Right" Margin="5"
+                 Text="LocationAccuracy" />
+      <TextBox Grid.Row="9" Grid.Column="1"
+               Height="20" HorizontalAlignment="Stretch" Margin="5" 
+               Text="{Binding Model.LocationAccuracy, ValidatesOnDataErrors=True}"/>
+      <TextBlock Grid.Row="10" Grid.Column="0"
+                 HorizontalAlignment="Right" Margin="5"
+                 Text="Comments" />
+      <TextBox Grid.Row="10" Grid.Column="1"
+               Height="20" HorizontalAlignment="Stretch" Margin="5" 
+               Text="{Binding Model.Comments, ValidatesOnDataErrors=True}"/>
+
+    </Grid>
+    <GridSplitter HorizontalAlignment="Stretch"
                   VerticalAlignment="Stretch"
                   Grid.ColumnSpan="2"
                   Grid.Row="1"
                   ResizeDirection="rows"
-                  Height="5" Background="#FFFFFFFF"/>
-        <!--Inspection grid-->
-        <Grid Margin="0,0,0,0" Grid.Row="2">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-            </Grid.RowDefinitions>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="2*"/>
-            </Grid.ColumnDefinitions>
+                  Height="5" Background="#FFFFFFFF" />
+    <!--Inspection grid-->
+    <Grid Margin="0,0,0,0" Grid.Row="2">
+      <Grid.RowDefinitions>
+        <RowDefinition Height="Auto" />
+        <RowDefinition Height="Auto" />
+        <RowDefinition Height="Auto" />
+        <RowDefinition Height="Auto" />
+        <RowDefinition Height="Auto" />
+        <RowDefinition Height="Auto" />
+        <RowDefinition Height="Auto" />
+        <RowDefinition Height="Auto" />
+        <RowDefinition Height="Auto" />
+        <RowDefinition Height="Auto" />
+        <RowDefinition Height="Auto" />
+        <RowDefinition Height="Auto" />
+      </Grid.RowDefinitions>
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="Auto" />
+        <ColumnDefinition Width="2*" />
+      </Grid.ColumnDefinitions>
 
-            <DockPanel Grid.Row="0" Grid.ColumnSpan="2" LastChildFill="true" KeyboardNavigation.TabNavigation="Local" Height="30">
-                <TextBlock Grid.Column="1" Text="Well Inspections" VerticalAlignment="Center" HorizontalAlignment="Center"
-                    FontSize="16" FontWeight="Light">
-                    <TextBlock.ToolTip>
-                        <WrapPanel Orientation="Vertical" MaxWidth="300">
-                            <TextBlock Text="Well Inspections" TextWrapping="Wrap"/>
-                        </WrapPanel>
-                    </TextBlock.ToolTip>
-            </TextBlock>
-            </DockPanel>
-            <ComboBox Grid.Row="1" Grid.Column="1" SelectedItem="{Binding Source={x:Static ui:WellInspectionModel.Instance}, Path=SelectedInspectionId, Mode=TwoWay}" Margin="5"
-                  ItemsSource="{Binding Source={x:Static ui:WellInspectionModel.Instance}, Path=InspectionIds, Mode=OneWay}"></ComboBox>
-            <Button Grid.Row="1" Content="Add New Inspection" Command="{Binding AddInspectionRecord}"/>
-            <TextBlock Grid.Row="2" 
-                   HorizontalAlignment="Right" Margin="5" 
-                   Text="Inspector"/>
-            <TextBox Grid.Row="2" Grid.Column="1" 
-                 Height="20" HorizontalAlignment="Stretch" Margin="5" 
-                 Text="{Binding Source={x:Static ui:WellInspectionModel.Instance}, Path=Inspector,
-            ValidatesOnDataErrors=True}"/>
-            <TextBlock Grid.Row="3" 
-                   HorizontalAlignment="Right" Margin="5" 
-                   Text="Inspection Type"/>
-            <TextBox Grid.Row="3" Grid.Column="1" 
-                 Height="20" HorizontalAlignment="Stretch" Margin="5" 
-                 Text="{Binding Source={x:Static ui:WellInspectionModel.Instance}, Path=InspectionType,
-            ValidatesOnDataErrors=True}"/>
-            <TextBlock Grid.Row="4" 
-                   HorizontalAlignment="Right" Margin="5"
-                   Text="Inspection Date"/>
-            <TextBox Grid.Row="4" Grid.Column="1" 
-                 Height="20" HorizontalAlignment="Stretch" Margin="5" 
-                 Text="{Binding Source={x:Static ui:WellInspectionModel.Instance}, Path=InspectionDate,
-            ValidatesOnDataErrors=True}"/>
-            <TextBlock Grid.Row="5" 
-                   HorizontalAlignment="Right" Margin="5" 
-                   Text="Comment"/>
-            <TextBox Grid.Row="5" Grid.Column="1" 
-                 Height="20" HorizontalAlignment="Stretch" Margin="5" 
-                 Text="{Binding Source={x:Static ui:WellInspectionModel.Instance}, Path=Comments,
-            ValidatesOnDataErrors=True}"/>
-        </Grid >        
+      <DockPanel Grid.Row="0" Grid.ColumnSpan="2" LastChildFill="true" KeyboardNavigation.TabNavigation="Local"
+                 Height="30">
+        <TextBlock Text="Well Inspections" VerticalAlignment="Center" HorizontalAlignment="Center"
+                   FontSize="16" FontWeight="Light">
+          <TextBlock.ToolTip>
+            <WrapPanel Orientation="Vertical" MaxWidth="300">
+              <TextBlock Text="Well Inspections" TextWrapping="Wrap" />
+            </WrapPanel>
+          </TextBlock.ToolTip>
+        </TextBlock>
+      </DockPanel>
+      <ComboBox Grid.Row="1" Grid.Column="1" Margin="5" />
+      <Button Grid.Row="1" Grid.Column="0" Content="Add New Inspection" />
+      <TextBlock Grid.Row="2" Grid.Column="0"
+                 HorizontalAlignment="Right" Margin="5"
+                 Text="Inspector" />
+      <TextBox Grid.Row="2" Grid.Column="1"
+               Height="20" HorizontalAlignment="Stretch" Margin="5" />
+      <TextBlock Grid.Row="3" Grid.Column="0"
+                 HorizontalAlignment="Right" Margin="5"
+                 Text="Inspection Type" />
+      <TextBox Grid.Row="3" Grid.Column="1"
+               Height="20" HorizontalAlignment="Stretch" Margin="5" />
+      <TextBlock Grid.Row="4" Grid.Column="0"
+                 HorizontalAlignment="Right" Margin="5"
+                 Text="Inspection Date" />
+      <TextBox Grid.Row="4" Grid.Column="1"
+               Height="20" HorizontalAlignment="Stretch" Margin="5" />
+      <TextBlock Grid.Row="5" Grid.Column="0"
+                 HorizontalAlignment="Right" Margin="5"
+                 Text="Comment" />
+      <TextBox Grid.Row="5" Grid.Column="1"
+               Height="20" HorizontalAlignment="Stretch" Margin="5" />
     </Grid>
+  </Grid>
 </UserControl>

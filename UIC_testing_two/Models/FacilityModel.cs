@@ -1,243 +1,201 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.ComponentModel.DataAnnotations;
 using System.Text;
 using System.Threading.Tasks;
-using ArcGIS.Desktop.Framework;
-using ArcGIS.Desktop.Framework.Contracts;
-using ArcGIS.Desktop.Editing.Events;
-using ArcGIS.Desktop.Framework.Threading.Tasks;
-using ArcGIS.Desktop.Mapping;
 using ArcGIS.Core.Data;
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
-using System.Collections.ObjectModel;
-using System.Windows.Data;
-using System.ComponentModel.DataAnnotations;
 using ArcGIS.Desktop.Core;
 using ArcGIS.Desktop.Editing;
+using ArcGIS.Desktop.Editing.Attributes;
+using ArcGIS.Desktop.Framework.Threading.Tasks;
+using ArcGIS.Desktop.Mapping;
+using Serilog;
+using UIC_Edit_Workflow.Validations;
 
-namespace UIC_Edit_Workflow
-{
-    class FacilityModel: ValidatableBindableBase, IWorkTaskModel
-    {
-        private static readonly FacilityModel _instance = new FacilityModel();
-        public const string ID_FIELD = "FacilityID";
-        private WellModel _wellModel = WellModel.Instance;
-        public event ControllingIdChangeDelegate FacilityChanged;
-
-        private FacilityModel()
-        {
-        }
-
-        #region properties
-        private long _selectedOid;
-        public long SelectedOid
-        {
-            get
-            {
-                return _selectedOid;
-            }
-
-            set
-            {
-                _selectedOid = value;
-            }
-        }
-        private FeatureLayer _storeFeature;
-        public FeatureLayer StoreFeature
-        {
-            get
-            {
-                if (_storeFeature == null)
-                {
-
-                    _storeFeature = QueuedTask.Run(() =>
-                    {
-                        var map = MapView.Active.Map;
-                        var feature = (FeatureLayer)map.FindLayers("UICFacility").First();
-                        return feature as FeatureLayer;
-                    }).Result;
-                }
-                return _storeFeature;
-            }
-        }
-        public static FacilityModel Instance
-        {
-            get
-            {
-                return _instance;
-            }
-        }
-
-        #region tablefields
-        private string _uicFacilityId = "";
-        [Required]
-        public string UicFacilityId
-        {
-            get
-            {
-                return _uicFacilityId;
-            }
-
-            set
-            {
-                SetProperty(ref _uicFacilityId, value);
-            }
-        }
-
-        private string _facilityGuid;
-        [Required]
-        public string FacilityGuid
-        {
-            get
-            {
-                return _facilityGuid;
-            }
-
-            set
-            {
-                SetProperty(ref _facilityGuid, value);
-            }
-        }
-
-        private string _countyFips;
-        [Required]
-        public string CountyFips
-        {
-            get
-            {
-                return _countyFips;
-            }
-
-            set
-            {
-                SetProperty(ref _countyFips, value);
-            }
-        }
-
-        private string _naicsPrimary;
-        [Required]
-        public string NaicsPrimary
-        {
-            get
-            {
-                return _naicsPrimary;
-            }
-
-            set
-            {
-                SetProperty(ref _naicsPrimary, value);
-            }
-        }
-
-        private string _facilityName = "";
-        [Required]
-        [NameTest]
-        public string FacilityName
-        {
-            get
-            {
-                return _facilityName;
-            }
-
-            set
-            {
-                SetProperty(ref _facilityName, value);
-            }
-        }
-
-        private string _facilityAddress;
-        [Required]
-        public string FacilityAddress
-        {
-            get
-            {
-                return _facilityAddress;
-            }
-
-            set
-            {
-                SetProperty(ref _facilityAddress, value);
-            }
-        }
-
-        private string _facilityCity;
-        [Required]
-        public string FacilityCity
-        {
-            get
-            {
-                return _facilityCity;
-            }
-
-            set
-            {
-                SetProperty(ref _facilityCity, value);
-            }
-        }
-
-        private string _facilityState;
-        [Required]
-        public string FacilityState
-        {
-            get
-            {
-                return _facilityState;
-            }
-
-            set
-            {
-                SetProperty(ref _facilityState, value);
-            }
-        }
-
-        private string _facilityZip;
-        public string FacilityZip
-        {
-            get
-            {
-                return _facilityZip;
-            }
-
-            set
-            {
-                SetProperty(ref _facilityZip, value);
-            }
-        }
-
-        private string _facilityMilepost;
-        public string FacilityMilepost
-        {
-            get
-            {
-                return _facilityMilepost;
-            }
-
-            set
-            {
-                SetProperty(ref _facilityMilepost, value);
-            }
-        }
+namespace UIC_Edit_Workflow.Models {
+    internal class FacilityModel : ValidatableBindableBase, IWorkTaskModel {
+        public const string IdField = "FacilityID";
+        public const string TableName = "UicFacility";
+        public readonly FeatureLayer FeatureLayer;
 
         private string _comments;
-        public string Comments
-        {
-            get
-            {
-                return _comments;
+
+        private string _countyFips;
+
+        private string _facilityAddress;
+
+        private string _facilityCity;
+
+        private string _facilityGuid;
+
+        private string _facilityMilepost;
+
+        private string _facilityName = "";
+
+        private string _facilityState;
+
+        private string _facilityZip;
+
+        private string _naicsPrimary;
+
+        private string _uicFacilityId = "";
+
+        private FacilityModel() {
+        }
+
+        public FacilityModel(FeatureLayer facilityLayer) : this() {
+            FeatureLayer = facilityLayer;
+        }
+
+        public long SelectedOid { get; set; }
+
+        [Required]
+        public string UicFacilityId {
+            get => _uicFacilityId;
+            set => SetProperty(ref _uicFacilityId, value);
+        }
+
+        [Required]
+        public string FacilityGuid {
+            get => _facilityGuid;
+            set => SetProperty(ref _facilityGuid, value);
+        }
+
+        [Required]
+        public string CountyFips {
+            get => _countyFips;
+            set => SetProperty(ref _countyFips, value);
+        }
+
+        [Required]
+        public string NaicsPrimary {
+            get => _naicsPrimary;
+            set => SetProperty(ref _naicsPrimary, value);
+        }
+
+        [Required]
+        [NameTest]
+        public string FacilityName {
+            get => _facilityName;
+            set => SetProperty(ref _facilityName, value);
+        }
+
+        [Required]
+        public string FacilityAddress {
+            get => _facilityAddress;
+            set => SetProperty(ref _facilityAddress, value);
+        }
+
+        [Required]
+        public string FacilityCity {
+            get => _facilityCity;
+            set => SetProperty(ref _facilityCity, value);
+        }
+
+        [Required]
+        public string FacilityState {
+            get => _facilityState;
+            set => SetProperty(ref _facilityState, value);
+        }
+
+        public string FacilityZip {
+            get => _facilityZip;
+            set => SetProperty(ref _facilityZip, value);
+        }
+
+        public string FacilityMilepost {
+            get => _facilityMilepost;
+            set => SetProperty(ref _facilityMilepost, value);
+        }
+
+        public string Comments {
+            get => _comments;
+            set => SetProperty(ref _comments, value);
+        }
+
+        public async Task UpdateModel(string facilityId) {
+            if (UicFacilityId == facilityId) {
+                return;
             }
 
-            set
-            {
-                SetProperty(ref _comments, value);
-            }
+            Log.Debug("showing facility data for {id}", facilityId);
+
+
+            var oldFacId = FacilityGuid;
+            await QueuedTask.Run(() => {
+                var qf = new QueryFilter {
+                    WhereClause = $"FacilityID = '{facilityId}'"
+                };
+                using (var cursor = FeatureLayer.Search(qf)) {
+                    var hasRow = cursor.MoveNext();
+                    if (!hasRow) {
+                        return;
+                    }
+                    using (var row = cursor.Current) {
+                        SelectedOid = Convert.ToInt64(row["OBJECTID"]);
+                        UicFacilityId = Convert.ToString(row["FacilityID"]);
+                        CountyFips = Convert.ToString(row["CountyFIPS"]);
+                        NaicsPrimary = Convert.ToString(row["NAICSPrimary"]);
+                        FacilityName = Convert.ToString(row["FacilityName"]);
+                        FacilityAddress = Convert.ToString(row["FacilityAddress"]);
+                        FacilityCity = Convert.ToString(row["FacilityCity"]);
+                        FacilityState = Convert.ToString(row["FacilityState"]);
+                        FacilityZip = Convert.ToString(row["FacilityZip"]);
+                        FacilityMilepost = Convert.ToString(row["FacilityMilePost"]);
+                        Comments = Convert.ToString(row["Comments"]);
+                        FacilityGuid = Convert.ToString(row["GUID"]);
+                    }
+                }
+            });
+
+            LoadHash = CalculateFieldHash();
+            FacilityChanged(oldFacId, FacilityGuid);
         }
-        #endregion
-        #endregion
-        protected override string fieldValueString()
-        {
-            StringBuilder sb = new StringBuilder();
+
+        public Task SaveChanges() => QueuedTask.Run(() => {
+            Log.Debug("saving facility changes for {guid}", SelectedOid);
+
+            //Create list of oids to update
+            var oidSet = new List<long> {
+                SelectedOid
+            };
+
+            //Create edit operation and update
+            var op = new EditOperation {
+                Name = "Update Feature"
+            };
+
+            var insp = new Inspector();
+            insp.Load(FeatureLayer, oidSet);
+            var canEdit = insp.AllowEditing;
+
+            insp["CountyFIPS"] = CountyFips;
+            insp["NAICSPrimary"] = NaicsPrimary;
+            insp["FacilityName"] = FacilityName;
+            insp["FacilityAddress"] = FacilityAddress;
+            insp["FacilityCity"] = FacilityCity;
+            insp["FacilityState"] = FacilityState;
+            insp["FacilityZip"] = FacilityZip;
+            insp["FacilityMilePost"] = FacilityMilepost;
+            insp["Comments"] = Comments;
+
+            op.Modify(insp);
+            op.Execute();
+            
+            Project.Current.SaveEditsAsync();
+        });
+
+        //Events
+        public async void ControllingIdChangedHandler(string oldId, string facGuid) {
+            Log.Debug("showing facility data for {guid}", facGuid);
+
+            await UpdateModel(facGuid);
+        }
+
+        public event ControllingIdChangeDelegate FacilityChanged;
+
+        protected override string FieldValueString() {
+            var sb = new StringBuilder();
             sb.Append(Convert.ToString(UicFacilityId));
             sb.Append(Convert.ToString(FacilityGuid));
             sb.Append(Convert.ToString(CountyFips));
@@ -249,90 +207,19 @@ namespace UIC_Edit_Workflow
             sb.Append(Convert.ToString(FacilityZip));
             sb.Append(Convert.ToString(FacilityMilepost));
             sb.Append(Convert.ToString(Comments));
+
             return sb.ToString();
-        }
-  
-        public async Task UpdateModel(string facilityId)
-        {
-            if (this.UicFacilityId != facilityId)
-            {
-                string oldFacId = this.FacilityGuid;
-                await QueuedTask.Run(() =>
-                {
-                    var map = MapView.Active.Map;
-                    QueryFilter qf = new QueryFilter()
-                    {
-                        WhereClause = string.Format("FacilityID = '{0}'", facilityId)
-                    };
-                    using (RowCursor cursor = StoreFeature.Search(qf))
-                    {
-                        bool hasRow = cursor.MoveNext();
-                        using (Row row = cursor.Current)
-                        {
-                            this.SelectedOid = Convert.ToInt64(row["OBJECTID"]);
-                            this.UicFacilityId = Convert.ToString(row["FacilityID"]);
-                            this.CountyFips = Convert.ToString(row["CountyFIPS"]);
-                            this.NaicsPrimary = Convert.ToString(row["NAICSPrimary"]);
-                            this.FacilityName = Convert.ToString(row["FacilityName"]);
-                            this.FacilityAddress = Convert.ToString(row["FacilityAddress"]);
-                            this.FacilityCity = Convert.ToString(row["FacilityCity"]);
-                            this.FacilityState = Convert.ToString(row["FacilityState"]);
-                            this.FacilityZip = Convert.ToString(row["FacilityZip"]);
-                            this.FacilityMilepost = Convert.ToString(row["FacilityMilePost"]);
-                            this.Comments = Convert.ToString(row["Comments"]);
-                            this.FacilityGuid = Convert.ToString(row["GUID"]);
-                        }
-                    }
-                });
-                LoadHash = calculateFieldHash();
-                FacilityChanged(oldFacId, this.FacilityGuid);
-            }
-        }
-
-        public Task SaveChanges()
-        {
-            Task t = QueuedTask.Run(() =>
-            {
-                //Create list of oids to update
-                var oidSet = new List<long>() { SelectedOid };
-                //Create edit operation and update
-                var op = new EditOperation();
-                op.Name = "Update Feature";
-                var insp = new ArcGIS.Desktop.Editing.Attributes.Inspector();
-                insp.Load(StoreFeature, oidSet);
-
-                insp["CountyFIPS"] = this.CountyFips;
-                insp["NAICSPrimary"] = this.NaicsPrimary;
-                insp["FacilityName"] = this.FacilityName;
-                insp["FacilityAddress"] = this.FacilityAddress;
-                insp["FacilityCity"] = this.FacilityCity;
-                insp["FacilityState"] = this.FacilityState;
-                insp["FacilityZip"] = this.FacilityZip;
-                insp["FacilityMilePost"] = this.FacilityMilepost;
-                insp["Comments"] = this.Comments;
-
-                op.Modify(insp);
-                op.Execute();
-                Project.Current.SaveEditsAsync();
-            });
-            return t;
         }
 
         //Validation
-        public bool IsCountyFipsComplete()
-        {
-            bool isFipsError = GetErrors("CountyFips") == null;
-            return !String.IsNullOrEmpty(this.CountyFips) && this.CountyFips.Length == 5 && isFipsError;
-        }
-        public bool AreAttributesComplete()
-        {
-            return !this.HasErrors;
+        public bool IsCountyFipsComplete() {
+            var isFipsError = GetErrors("CountyFips") == null;
+
+            return !string.IsNullOrEmpty(CountyFips) && CountyFips.Length == 5 && isFipsError;
         }
 
-        //Events
-        public async void ControllingIdChangedHandler(string oldId, string facGuid)
-        {
-            await UpdateModel(facGuid);
+        public bool AreAttributesComplete() {
+            return !HasErrors;
         }
     }
 }

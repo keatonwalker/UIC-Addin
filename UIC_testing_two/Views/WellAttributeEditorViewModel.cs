@@ -1,190 +1,139 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using System;
 using System.Threading.Tasks;
+using System.Windows.Input;
 using ArcGIS.Desktop.Framework;
 using ArcGIS.Desktop.Framework.Contracts;
-using System.Windows.Input;
 using ArcGIS.Desktop.Framework.Threading.Tasks;
 using ArcGIS.Desktop.Mapping;
-using ArcGIS.Core.Data;
 using ArcGIS.Desktop.Mapping.Events;
+using UIC_Edit_Workflow.Models;
 
-namespace UIC_Edit_Workflow
-{
-    internal class WellAttributeEditorViewModel : DockPane
-    {
-        private FacilityModel _facilityModel = FacilityModel.Instance;
-        private WellModel _wellModel = WellModel.Instance;
-        private WellInspectionModel _inspectionModel = WellInspectionModel.Instance;
-        private FeatureLayer _wellLayer = null;
+namespace UIC_Edit_Workflow.Views {
+    internal class WellAttributeEditorViewModel : DockPane {
+        public const string DockPaneId = "WellAttributeEditorPane";
 
-        private const string _dockPaneID = "UIC_Edit_Workflow_WellAttributeEditor";
+        public const string TableName = "UICWell";
 
-        protected WellAttributeEditorViewModel()
-        {
+        private RelayCommand _addNewInspection;
+
+        private RelayCommand _addSelectedWell;
+
+        /// <summary>
+        ///     Text shown near the top of the DockPane.
+        /// </summary>
+        private string _heading = "My DockPane";
+
+        private string _newWellClass;
+
+        private bool _newWellSelected;
+        private WellModel _wellModel;
+
+        protected WellAttributeEditorViewModel() {
             MapSelectionChangedEvent.Subscribe(OnSelectionChanged);
         }
 
-        private bool _newWellSelected = false;
-        public bool NewWellSelected
-        {
-            get
-            {
-                return _newWellSelected;
-            }
-
-            set
-            {
-                SetProperty(ref _newWellSelected, value, () => NewWellSelected);
-            }
+        public WellModel Model {
+            get => _wellModel;
+            set => SetProperty(ref _wellModel, value, () => Model);
         }
 
-        private string _newWellClass;
-        public string NewWellClass
-        {
-            get
-            {
-                return _newWellClass;
-            }
-
-            set
-            {
-                SetProperty(ref _newWellClass, value, () => NewWellClass);
-            }
+        public bool NewWellSelected {
+            get => _newWellSelected;
+            set => SetProperty(ref _newWellSelected, value, () => NewWellSelected);
         }
 
-        private RelayCommand _addSelectedWell;
-        public ICommand AddWell
-        {
-            get
-            {
-                if (_addSelectedWell == null)
-                {
-                    _addSelectedWell = new RelayCommand(() => AddSelectedWell(), () => { return !String.IsNullOrWhiteSpace(NewWellClass); });
+        public string NewWellClass {
+            get => _newWellClass;
+            set => SetProperty(ref _newWellClass, value, () => NewWellClass);
+        }
+
+        public ICommand AddWell {
+            get {
+                if (_addSelectedWell == null) {
+                    _addSelectedWell =
+                        new RelayCommand(AddSelectedWell, () => !string.IsNullOrWhiteSpace(NewWellClass));
                 }
+
                 return _addSelectedWell;
             }
         }
 
-        private Task AddSelectedWell()
-        {
-            Task t = QueuedTask.Run(() =>
-            {
-                if (_wellLayer == null)
-                {
-                    _wellLayer = _wellModel.StoreFeature;
-                }
-
-                long selectedId;
-                var currentselection = _wellLayer.GetSelection();
-                using (RowCursor cursor = currentselection.Search())
-                {
-                    bool hasrow = cursor.MoveNext();
-                    using (Row row = cursor.Current)
-                    {
-                        selectedId = Convert.ToInt64(row["OBJECTID"]);
-                    }
-                }
-                _wellModel.AddNew(selectedId, _facilityModel.FacilityGuid, _facilityModel.CountyFips);
-                NewWellSelected = false;
-            });
-            return t;
+        public string Heading {
+            get => _heading;
+            set => SetProperty(ref _heading, value, () => Heading);
         }
 
-
-        private async void OnSelectionChanged(MapSelectionChangedEventArgs mse)
-        {
-            foreach (var kvp in mse.Selection)
-            {
-                if ((kvp.Key as BasicFeatureLayer) == null || kvp.Key.Name != "UICWell")
-                    continue;
-                BasicFeatureLayer selectedLayer = (BasicFeatureLayer)kvp.Key;
-                //Is a feature selected? Is it an unassigned well feature?
-                if (kvp.Value.Count > 0 && await IsUnassignedWell(selectedLayer))
-                {
-                    NewWellSelected = true;
+        public ICommand AddInspectionRecord {
+            get {
+                if (_addNewInspection == null) {
+                    _addNewInspection = new RelayCommand(() => AddNewInspection(), () => true);
                 }
-                else
-                {
-                    NewWellSelected = false;
-                }
-            }
-         }
 
-        public static Task<bool> IsUnassignedWell(BasicFeatureLayer selectedLayer)
-        {
-            return QueuedTask.Run(() => {
-                bool noFacilityFk;
-                bool noWellClass;
-                var currentSelection = selectedLayer.GetSelection();
-                using (RowCursor cursor = currentSelection.Search())
-                {
-                    bool hasrow = cursor.MoveNext();
-                    using (Row row = cursor.Current)
-                    {
-                        noFacilityFk = String.IsNullOrWhiteSpace(Convert.ToString(row["Facility_FK"]));
-                        noWellClass = String.IsNullOrWhiteSpace(Convert.ToString(row["WellClass"]));
-                    }
-                }
-                return noFacilityFk && noWellClass;
-            });
-        }
-
-        /// <summary>
-        /// Show the DockPane.
-        /// </summary>
-        internal static void Show()
-        {
-            DockPane pane = FrameworkApplication.DockPaneManager.Find(_dockPaneID);
-            if (pane == null)
-                return;
-
-            pane.Activate();
-        }
-
-        /// <summary>
-        /// Text shown near the top of the DockPane.
-        /// </summary>
-        private string _heading = "My DockPane";
-        public string Heading
-        {
-            get { return _heading; }
-            set
-            {
-                SetProperty(ref _heading, value, () => Heading);
-            }
-        }
-
-        private RelayCommand _addNewInspection;
-        public ICommand AddInspectionRecord
-        {
-            get
-            {
-                if (_addNewInspection == null)
-                {
-                    _addNewInspection = new RelayCommand(() => AddNewInspection(), () => { return true; });
-                }
                 return _addNewInspection;
             }
         }
-        private void AddNewInspection()
-        {
-            string wellGuid = _wellModel.WellGuid;
 
-            _inspectionModel.AddNew(wellGuid);
+        private Task AddSelectedWell() => QueuedTask.Run(() => {
+            long selectedId;
+            var currentselection = _wellModel.FeatureLayer.GetSelection();
+            using (var cursor = currentselection.Search()) {
+                var hasrow = cursor.MoveNext();
+                using (var row = cursor.Current) {
+                    selectedId = Convert.ToInt64(row["OBJECTID"]);
+                }
+            }
+
+            var facility = UicWorkflowModule.GetFacilityModel();
+
+            _wellModel.AddNew(selectedId, facility.FacilityGuid, facility.CountyFips);
+            NewWellSelected = false;
+        });
+
+        private async void OnSelectionChanged(MapSelectionChangedEventArgs mse) {
+            foreach (var kvp in mse.Selection) {
+                if (!(kvp.Key is BasicFeatureLayer) || kvp.Key.Name != TableName) {
+                    continue;
+                }
+
+                var selectedLayer = (BasicFeatureLayer)kvp.Key;
+                //Is a feature selected? Is it an unassigned well feature?
+                if (kvp.Value.Count > 0 && await IsUnassignedWell(selectedLayer)) {
+                    NewWellSelected = true;
+                } else {
+                    NewWellSelected = false;
+                }
+            }
         }
-}
 
-    /// <summary>
-    /// Button implementation to show the DockPane.
-    /// </summary>
-    internal class WellAttributeEditor_ShowButton : Button
-    {
-        protected override void OnClick()
-        {
-            WellAttributeEditorViewModel.Show();
+        public static Task<bool> IsUnassignedWell(BasicFeatureLayer selectedLayer) => QueuedTask.Run(() => {
+            bool noFacilityFk;
+            bool noWellClass;
+
+            var currentSelection = selectedLayer.GetSelection();
+            using (var cursor = currentSelection.Search()) {
+                var hasrow = cursor.MoveNext();
+                using (var row = cursor.Current) {
+                    noFacilityFk = string.IsNullOrWhiteSpace(Convert.ToString(row["Facility_FK"]));
+                    noWellClass = string.IsNullOrWhiteSpace(Convert.ToString(row["WellClass"]));
+                }
+            }
+
+            return noFacilityFk && noWellClass;
+        });
+
+        /// <summary>
+        ///     Show the DockPane.
+        /// </summary>
+        internal static void Show() {
+            var pane = FrameworkApplication.DockPaneManager.Find(DockPaneId);
+            pane?.Activate();
+        }
+
+        private void AddNewInspection() {
+            var inspectionModel = UicWorkflowModule.GetWellInspectionModel();
+            var wellGuid = _wellModel.WellGuid;
+
+            inspectionModel.AddNew(wellGuid);
         }
     }
 }

@@ -1,330 +1,228 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Data;
+using ArcGIS.Core.Data;
+using ArcGIS.Desktop.Core;
+using ArcGIS.Desktop.Editing;
+using ArcGIS.Desktop.Editing.Attributes;
+using ArcGIS.Desktop.Framework;
 using ArcGIS.Desktop.Framework.Threading.Tasks;
 using ArcGIS.Desktop.Mapping;
-using ArcGIS.Core.Data;
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
-using System.Collections.ObjectModel;
-using System.Windows.Data;
-using System.ComponentModel.DataAnnotations;
-using ArcGIS.Desktop.Editing;
-using ArcGIS.Desktop.Core;
+using Serilog;
 
-namespace UIC_Edit_Workflow
-{
-    class WellInspectionModel : ValidatableBindableBase, IWorkTaskModel
-    {
-        private readonly object lockCollection = new object();
-        private static readonly WellInspectionModel instance = new WellInspectionModel();
+namespace UIC_Edit_Workflow.Models {
+    internal class WellInspectionModel : ValidatableBindableBase, IWorkTaskModel {
+        public const string TableName = "UICInspection";
 
-        private WellInspectionModel()
-        {
-            readOnlyInspectionIds = new ReadOnlyObservableCollection<string>(_inspectionIds);
-            Utils.RunOnUiThread(() =>
-            {
-                BindingOperations.EnableCollectionSynchronization(readOnlyInspectionIds, lockCollection);
+        private readonly ObservableCollection<string> _inspectionIds = new ObservableCollection<string>();
+        private readonly object _lockCollection = new object();
+        public readonly StandaloneTable Table;
+
+        private string _comments;
+        private string _createdOn;
+        private string _editedBy;
+        private string _inspectionDate;
+        private string _inspectionId;
+        private string _inspectionType;
+        private string _inspector;
+        private string _modifiedOn;
+        private string _selectedInspectionId;
+        private string _wellFk;
+
+        private WellInspectionModel() {
+            InspectionIds = new ReadOnlyObservableCollection<string>(_inspectionIds);
+            Utils.RunOnUiThread(() => {
+                BindingOperations.EnableCollectionSynchronization(InspectionIds, _lockCollection);
             });
         }
 
-        private string _createdOn;
-        private string _modifiedOn;
-        private string _editedBy;
+        public WellInspectionModel(StandaloneTable standaloneTable) : this() {
+            if (standaloneTable == null) {
+                Log.Warning("the {TableName} layer could not be found", TableName);
 
-
-        private readonly ObservableCollection<string> _inspectionIds = new ObservableCollection<string>();
-        private readonly ReadOnlyObservableCollection<string> readOnlyInspectionIds;
-
-        #region properties
-        public ReadOnlyObservableCollection<string> InspectionIds => readOnlyInspectionIds;
-
-        private string _selectedInspectionId;
-        public string SelectedInspectionId
-        {
-            get
-            {
-                return _selectedInspectionId;
+                FrameworkApplication.AddNotification(new Notification {
+                    Message = $"The {TableName} layer could not be found. Please add it."
+                });
             }
 
-            set
-            {
+            Table = standaloneTable;
+        }
+
+        public ReadOnlyObservableCollection<string> InspectionIds { get; }
+
+        public string SelectedInspectionId {
+            get => _selectedInspectionId;
+            set {
                 SetProperty(ref _selectedInspectionId, value);
-                if (_selectedInspectionId != null)
+                if (_selectedInspectionId != null) {
+                    // TODO: change to method
                     UpdateModel(_selectedInspectionId);
-            }
-        }
-        private long _selectedOid;
-        public long SelectedOid
-        {
-            get
-            {
-                return _selectedOid;
-            }
-
-            set
-            {
-                _selectedOid = value;
-            }
-        }
-        private StandaloneTable _storeFeature;
-        public StandaloneTable StoreFeature
-        {
-            get
-            {
-                if (_storeFeature == null)
-                {
-
-                    _storeFeature = QueuedTask.Run(() =>
-                    {
-                        var map = MapView.Active.Map;
-                        var feature = (StandaloneTable)map.FindStandaloneTables("UICInspection").First();
-                        return feature as StandaloneTable;
-                    }).Result;
                 }
-                return _storeFeature;
             }
         }
 
-        public static WellInspectionModel Instance
-        {
-            get
-            {
-                return instance;
-            }
+        public long SelectedOid { get; set; }
+
+        public string WellFk {
+            get => _wellFk;
+            set => SetProperty(ref _wellFk, value);
         }
 
-        #region tablefields
-        private string _wellFk;
-        public string WellFk
-        {
-            get
-            {
-                return _wellFk;
-            }
-
-            set
-            {
-                SetProperty(ref _wellFk, value);
-            }
+        public string InspectionId {
+            get => _inspectionId;
+            set => SetProperty(ref _inspectionId, value);
         }
 
-        private string _inspectionId;
-        public string InspectionId
-        {
-            get
-            {
-                return _inspectionId;
-            }
-
-            set
-            {
-                SetProperty(ref _inspectionId, value);
-            }
+        public string Inspector {
+            get => _inspector;
+            set => SetProperty(ref _inspector, value);
         }
 
-        private string _inspector;
-        public string Inspector
-        {
-            get
-            {
-                return _inspector;
-            }
-
-            set
-            {
-                SetProperty(ref _inspector, value);
-            }
+        public string InspectionType {
+            get => _inspectionType;
+            set => SetProperty(ref _inspectionType, value);
         }
 
-        private string _inspectionType;
-        public string InspectionType
-        {
-            get
-            {
-                return _inspectionType;
-            }
-
-            set
-            {
-                SetProperty(ref _inspectionType, value);
-            }
+        public string InspectionDate {
+            get => _inspectionDate;
+            set => SetProperty(ref _inspectionDate, value);
         }
 
-        private string _inspectionDate;
-        public string InspectionDate
-        {
-            get
-            {
-                return _inspectionDate;
-            }
-
-            set
-            {
-                SetProperty(ref _inspectionDate, value);
-            }
+        public string Comments {
+            get => _comments;
+            set => SetProperty(ref _comments, value);
         }
 
-        private string _comments;
-        public string Comments
-        {
-            get
-            {
-                return _comments;
-            }
 
-            set
-            {
-                SetProperty(ref _comments, value);
-            }
+        public async Task UpdateModel(string inspectionId) {
+            Log.Debug("showing well inspection data for {id}", inspectionId);
+
+            await QueuedTask.Run(() => {
+                if (string.IsNullOrEmpty(inspectionId)) {
+                    SelectedOid = -1;
+                    WellFk = "";
+                    InspectionId = "";
+                    Inspector = "";
+                    InspectionType = "";
+                    InspectionDate = "";
+                    Comments = "";
+                } else {
+                    var qf = new QueryFilter {
+                        WhereClause = $"GUID = '{inspectionId}'"
+                    };
+                    using (var cursor = Table.Search(qf)) {
+                        var hasRow = cursor.MoveNext();
+                        if (!hasRow) {
+                            return;
+                        }
+                        using (var row = cursor.Current) {
+                            SelectedOid = Convert.ToInt64(row["OBJECTID"]);
+                            WellFk = Convert.ToString(row["Well_FK"]);
+                            InspectionId = Convert.ToString(row["GUID"]);
+                            Inspector = Convert.ToString(row["Inspector"]);
+                            InspectionType = Convert.ToString(row["InspectionType"]);
+                            InspectionDate = Convert.ToString(row["InspectionDate"]);
+                            Comments = Convert.ToString(row["Comments"]);
+                        }
+                    }
+                }
+            });
+
+            LoadHash = CalculateFieldHash();
         }
 
-        #endregion // End tablefields
-        #endregion
-        protected override string fieldValueString()
-        {
-            StringBuilder sb = new StringBuilder();
+        //Events
+        public async void ControllingIdChangedHandler(string oldGuid, string newGuid) {
+            Log.Debug("showing well inspection data for {guid}", newGuid);
+
+            await AddIdsForFacility(newGuid);
+            SelectedInspectionId = InspectionIds.FirstOrDefault();
+        }
+
+        public Task SaveChanges() => QueuedTask.Run(() => {
+            Log.Debug("saving well inspection changes for {id}", SelectedOid);
+
+            //Create list of oids to update
+            var oidSet = new List<long> {
+                SelectedOid
+            };
+
+            //Create edit operation and update
+            var op = new EditOperation {
+                Name = "Update Feature"
+            };
+            var insp = new Inspector();
+            insp.Load(Table, oidSet);
+
+            insp["Well_FK"] = WellFk;
+            insp["GUID"] = InspectionId;
+            insp["Inspector"] = InspectionId;
+            insp["InspectionType"] = InspectionType;
+            insp["InspectionDate"] = InspectionDate;
+            insp["Comments"] = Comments;
+
+            op.Modify(insp);
+            op.Execute();
+            Project.Current.SaveEditsAsync();
+        });
+
+        protected override string FieldValueString() {
+            var sb = new StringBuilder();
             sb.Append(Convert.ToString(InspectionId));
             sb.Append(Convert.ToString(Inspector));
             sb.Append(Convert.ToString(InspectionType));
             sb.Append(Convert.ToString(InspectionDate));
             sb.Append(Convert.ToString(Comments));
+
             return sb.ToString();
         }
 
-        public async Task AddIdsForFacility(string facilityId)
-        {
-            await QueuedTask.Run(() =>
-            {
-                _inspectionIds.Clear();
-                QueryFilter qf = new QueryFilter()
-                {
-                    WhereClause = string.Format("Well_FK = '{0}'", facilityId)
+        public async Task AddIdsForFacility(string facilityId) => await QueuedTask.Run(() => {
+            _inspectionIds.Clear();
+            var qf = new QueryFilter {
+                WhereClause = $"Well_FK = '{facilityId}'"
+            };
+            using (var cursor = Table.Search(qf)) {
+                while (cursor.MoveNext()) {
+                    using (var row = cursor.Current) {
+                        _inspectionIds.Add(Convert.ToString(row["GUID"]));
+                    }
+                }
+            }
+        });
+
+        public bool IsInspectionAttributesComplete() {
+            return !string.IsNullOrEmpty(WellFk) &&
+                   !string.IsNullOrEmpty(InspectionId) &&
+                   !string.IsNullOrEmpty(Inspector) &&
+                   !string.IsNullOrEmpty(InspectionDate) &&
+                   !string.IsNullOrEmpty(InspectionType) &&
+                   !string.IsNullOrEmpty(Comments);
+        }
+
+        public async void AddNew(string facilityGuid) => await QueuedTask.Run(() => {
+            Log.Debug("adding new well inspection to {guid}", facilityGuid);
+
+            var newGuid = Guid.NewGuid();
+            // Create dictionary of attribute names and values
+            var attributes = new Dictionary<string, object> {
+                    {"Well_FK", facilityGuid},
+                    {"GUID", newGuid}
                 };
-                using (RowCursor cursor = StoreFeature.Search(qf))
-                {
-                    while (cursor.MoveNext())
-                    {
-                        using (Row row = cursor.Current)
-                        {
-                            _inspectionIds.Add(Convert.ToString(row["GUID"]));
-                        }
-                    }
-                }
-            });
-        }
 
-        public async Task UpdateModel(string inspectionId)
-        {
-            await QueuedTask.Run(() =>
-            {
-
-                if (inspectionId == null || inspectionId == String.Empty)
-                {
-                    this.SelectedOid = -1;
-                    this.WellFk = "";
-                    this.InspectionId = "";
-                    this.Inspector = "";
-                    this.InspectionType = "";
-                    this.InspectionDate = "";
-                    this.Comments = "";
-                }
-                else
-                {
-                    QueryFilter qf = new QueryFilter()
-                    {
-                        WhereClause = string.Format("GUID = '{0}'", inspectionId)
-                    };
-                    using (RowCursor cursor = StoreFeature.Search(qf))
-                    {
-                        bool hasRow = cursor.MoveNext();
-                        using (Row row = cursor.Current)
-                        {
-                            this.SelectedOid = Convert.ToInt64(row["OBJECTID"]);
-                            this.WellFk = Convert.ToString(row["Well_FK"]);
-                            this.InspectionId = Convert.ToString(row["GUID"]);
-                            this.Inspector = Convert.ToString(row["Inspector"]);
-                            this.InspectionType = Convert.ToString(row["InspectionType"]);
-                            this.InspectionDate = Convert.ToString(row["InspectionDate"]);
-                            this.Comments = Convert.ToString(row["Comments"]);
-                        }
-                    }
-                }
-            });
-            LoadHash = calculateFieldHash();
-        }
-
-        public bool IsInspectionAttributesComplete()
-        {
-            return !String.IsNullOrEmpty(this.WellFk) &&
-                   !String.IsNullOrEmpty(this.InspectionId) &&
-                   !String.IsNullOrEmpty(this.Inspector) &&
-                   !String.IsNullOrEmpty(this.InspectionDate) &&
-                   !String.IsNullOrEmpty(this.InspectionType) &&
-                   !String.IsNullOrEmpty(this.Comments);
-        }
-        //Events
-        public async void ControllingIdChangedHandler(string oldGuid, string newGuid)
-        {
-            await AddIdsForFacility(newGuid);
-            if (InspectionIds.Count == 0)
-            {
-                SelectedInspectionId = String.Empty;
-            }
-            else
-            {
-                SelectedInspectionId = InspectionIds.First();
-            }
-
-        }
-
-        public Task SaveChanges()
-        {
-            Task t = QueuedTask.Run(() =>
-            {
-                //Create list of oids to update
-                var oidSet = new List<long>() { SelectedOid };
-                //Create edit operation and update
-                var op = new EditOperation();
-                op.Name = "Update Feature";
-                var insp = new ArcGIS.Desktop.Editing.Attributes.Inspector();
-                insp.Load(StoreFeature, oidSet);
-
-                insp["Well_FK"] = this.WellFk;
-                insp["GUID"] = this.InspectionId;
-                insp["Inspector"] = this.InspectionId;
-                insp["InspectionType"] = this.InspectionType;
-                insp["InspectionDate"] = this.InspectionDate;
-                insp["Comments"] = this.Comments;
-
-                op.Modify(insp);
-                op.Execute();
-                Project.Current.SaveEditsAsync();
-            });
-            return t;
-        }
-
-        public async void AddNew(string facilityGuid)
-        {
-            await QueuedTask.Run(() =>
-            {
-                Guid newGuid = Guid.NewGuid();
-                // Create dictionary of attribute names and values
-                var attributes = new Dictionary<string, object>();
-                attributes.Add("Well_FK", facilityGuid);
-                attributes.Add("GUID", newGuid);
-
-                var createFeatures = new EditOperation();
-                createFeatures.Name = "Create Features";
-                createFeatures.Create(StoreFeature, attributes);
-                createFeatures.Execute();
-                string guidString = "{" + newGuid.ToString().ToUpper() + "}";
-                _inspectionIds.Add(guidString);
-                SelectedInspectionId = guidString;
-            });
-        }
-
+            var createFeatures = new EditOperation {
+                Name = "Create Features"
+            };
+            createFeatures.Create(Table, attributes);
+            createFeatures.Execute();
+            
+            var guidString = "{" + newGuid.ToString().ToUpper() + "}";
+            _inspectionIds.Add(guidString);
+            SelectedInspectionId = guidString;
+        });
     }
 }

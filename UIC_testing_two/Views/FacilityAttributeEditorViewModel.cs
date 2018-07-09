@@ -1,77 +1,56 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Input;
 using ArcGIS.Desktop.Framework;
 using ArcGIS.Desktop.Framework.Contracts;
-using System.ComponentModel;
+using UIC_Edit_Workflow.Models;
 
-namespace UIC_Edit_Workflow
-{
-    internal class FacilityAttributeEditorViewModel : DockPane
-    {
-        private const string _dockPaneID = "UIC_Edit_Workflow_FacilityAttributeEditor";
-        private FacilityModel _facilityModel = FacilityModel.Instance;
-        private FacilityInspectionModel _inspectionModel = FacilityInspectionModel.Instance;
-        protected FacilityAttributeEditorViewModel()
-        {
-        }
-
-        /// <summary>
-        /// Show the DockPane.
-        /// </summary>
-        internal static void Show()
-            {
-                DockPane pane = FrameworkApplication.DockPaneManager.Find(_dockPaneID);
-                if (pane == null)
-                    return;
-
-                pane.Activate();
-            }
-
-        /// <summary>
-        /// Text shown near the top of the DockPane.
-        /// </summary>
-        private string _heading = "Facility Attributes";
-        public string Heading
-        {
-            get { return _heading; }
-            set
-            {
-                SetProperty(ref _heading, value, () => Heading);
-            }
-        }
+namespace UIC_Edit_Workflow.Views {
+    internal class FacilityAttributeEditorViewModel : DockPane {
+        public const string DockPaneId = "FacilityAttributeEditorPane";
 
         private RelayCommand _addNewInspection;
-        public ICommand AddInspectionRecord
-        {
-            get
-            {
-                if (_addNewInspection == null)
-                {
-                    _addNewInspection = new RelayCommand(() => AddNewInspection(), () => { return true; });
+
+        public FacilityModel Model {
+            get => _facilityModel;
+            set => SetProperty(ref _facilityModel, value, () => Model);
+        }
+
+        /// <summary>
+        ///     Text shown near the top of the DockPane.
+        /// </summary>
+        private string _heading = "Facility Attributes";
+
+        private FacilityModel _facilityModel;
+
+        public string Heading {
+            get => _heading;
+            set => SetProperty(ref _heading, value, () => Heading);
+        }
+
+        public ICommand AddInspectionRecord {
+            get {
+                if (_addNewInspection == null) {
+                    _addNewInspection = new RelayCommand(() => AddNewInspection(), () => true);
                 }
+
                 return _addNewInspection;
             }
         }
-        private void AddNewInspection()
-        {
-            string facGuid = _facilityModel.FacilityGuid;
 
-            _inspectionModel.AddNew(facGuid);
+        /// <summary>
+        ///     Show the DockPane.
+        /// </summary>
+        internal static void Show() {
+            var pane = FrameworkApplication.DockPaneManager.Find(DockPaneId);
+            pane?.Activate();
         }
-    }
 
-    /// <summary>
-    /// Button implementation to show the DockPane.
-    /// </summary>
-    internal class AttributeEditor_ShowButton : Button
-    {
-        protected override void OnClick()
-        {
-            FacilityAttributeEditorViewModel.Show();
+        private void AddNewInspection() {
+            var facility = UicWorkflowModule.GetFacilityModel();
+            var inspection = UicWorkflowModule.GetFacilityInspectionModel();
+
+            var facGuid = facility.FacilityGuid;
+
+            inspection.AddNew(facGuid);
         }
     }
 }

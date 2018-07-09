@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -7,111 +7,73 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
 using System.Text;
-using System.Threading.Tasks;
 
-namespace UIC_Edit_Workflow
-{
-    class ValidatableBindableBase : BindableBase, INotifyDataErrorInfo
-    {
+namespace UIC_Edit_Workflow.Models {
+    internal class ValidatableBindableBase : BindableBase, INotifyDataErrorInfo {
+        private readonly Dictionary<string, List<string>> _errors = new Dictionary<string, List<string>>();
 
-        protected ValidatableBindableBase()
-        {
-            LoadHash = calculateFieldHash();
+        protected ValidatableBindableBase() {
+            LoadHash = CalculateFieldHash();
         }
-        private Dictionary<string, List<string>> _errors = new Dictionary<string, List<string>>();
+
+        public string LoadHash { get; set; }
         public event EventHandler<DataErrorsChangedEventArgs> ErrorsChanged;
 
-        public IEnumerable GetErrors(string propertyName)
-        {
-            if (_errors.ContainsKey(propertyName))
-            {
+        public IEnumerable GetErrors(string propertyName) {
+            if (_errors.ContainsKey(propertyName)) {
                 return _errors[propertyName];
             }
-            else
-            {
-                return null;
-            }
+
+            return null;
         }
 
-        public bool HasErrors
-        {
-            get
-            {
-                return _errors.Count > 0;
-            }
-        }
+        public bool HasErrors => _errors.Count > 0;
 
-        protected override void SetProperty<T>(ref T member, T val, [CallerMemberName] string propertyName = null)
-        {
+        protected override void SetProperty<T>(ref T member, T val, [CallerMemberName] string propertyName = null) {
             ValidateProperty(propertyName, val);
-            base.SetProperty<T>(ref member, val, propertyName);
+            base.SetProperty(ref member, val, propertyName);
         }
 
-        private void ValidateProperty<T>(string propertyName, T value)
-        {
+        private void ValidateProperty<T>(string propertyName, T value) {
             var results = new List<ValidationResult>();
-            ValidationContext context = new ValidationContext(this);
-            context.MemberName = propertyName;
+            var context = new ValidationContext(this) {
+                MemberName = propertyName
+            };
             Validator.TryValidateProperty(value, context, results);
 
-            if (results.Any())
-            {
+            if (results.Any()) {
                 _errors[propertyName] = results.Select(c => c.ErrorMessage).ToList();
-            }
-            else
-            {
+            } else {
                 _errors.Remove(propertyName);
             }
-            ErrorsChanged(this, new DataErrorsChangedEventArgs(propertyName));
+
+            ErrorsChanged?.Invoke(this, new DataErrorsChangedEventArgs(propertyName));
         }
 
-        private string _loadHash;
-        public string LoadHash
-        {
-            get
-            {
-                return _loadHash;
-            }
-
-            set
-            {
-                _loadHash = value;
-            }
-        }
-
-        protected virtual string fieldValueString()
-        {
+        protected virtual string FieldValueString() {
             throw new NotImplementedException("not yet implemented");
         }
-        protected string calculateFieldHash()
-        {
-            string fieldString = fieldValueString();
+
+        protected string CalculateFieldHash() {
+            var fieldString = FieldValueString();
             // step 1, calculate MD5 hash from input
 
-            MD5 md5 = MD5.Create();
-
-            byte[] inputBytes = Encoding.ASCII.GetBytes(fieldString);
-
-            byte[] hash = md5.ComputeHash(inputBytes);
+            var md5 = MD5.Create();
+            var inputBytes = Encoding.ASCII.GetBytes(fieldString);
+            var hash = md5.ComputeHash(inputBytes);
 
             // step 2, convert byte array to hex string
+            var sb = new StringBuilder();
 
-            StringBuilder sb = new StringBuilder();
-
-            for (int i = 0; i < hash.Length; i++)
-
-            {
-
-                sb.Append(hash[i].ToString("X2"));
-
+            foreach (var t in hash) {
+                sb.Append(t.ToString("X2"));
             }
 
             return sb.ToString();
         }
 
-        public bool HasModelChanged()
-        {
-            return !LoadHash.Equals(calculateFieldHash());
+        public bool HasModelChanged() {
+            return !LoadHash.Equals(CalculateFieldHash());
         }
     }
 }
