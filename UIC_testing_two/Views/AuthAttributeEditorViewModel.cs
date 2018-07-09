@@ -44,15 +44,17 @@ namespace UIC_Edit_Workflow.Views {
         /// </summary>
         internal static void Show() {
             var pane = FrameworkApplication.DockPaneManager.Find(DockPaneId);
-
             pane?.Activate();
         }
 
         private void AddNewRecord() {
-//            var facGuid = FacilityModel.FacilityGuid;
-//            var facFips = FacilityModel.CountyFips;
-//
-//            _authModel.AddNew(facGuid, facFips);
+            var facility = UicWorkflowModule.GetFacilityModel();
+            var auth = UicWorkflowModule.GetAuthorizationModel();
+               
+            var facGuid = facility.FacilityGuid;
+            var facFips = facility.CountyFips;
+
+            auth.AddNew(facGuid, facFips);
         }
     }
 }

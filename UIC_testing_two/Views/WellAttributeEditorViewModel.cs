@@ -13,9 +13,6 @@ namespace UIC_Edit_Workflow.Views {
         public const string DockPaneId = "WellAttributeEditorPane";
 
         public const string TableName = "UICWell";
-//        private readonly FacilityModel _facilityModel = UicWorkflowModule.GetFacilityModel();
-//        private readonly WellInspectionModel _inspectionModel = UicWorkflowModule.GetWellInspectionModel();
-//        private readonly WellModel _wellModel = UicWorkflowModule.GetWellModel();
 
         private RelayCommand _addNewInspection;
 
@@ -78,18 +75,19 @@ namespace UIC_Edit_Workflow.Views {
 
         private Task AddSelectedWell() => QueuedTask.Run(() => {
             long selectedId;
-//            var currentselection = _wellModel.FeatureLayer.GetSelection();
-//            using (var cursor = currentselection.Search()) {
-//                var hasrow = cursor.MoveNext();
-//                using (var row = cursor.Current) {
-//                    selectedId = Convert.ToInt64(row["OBJECTID"]);
-//                }
-//            }
-//
-//            _wellModel.AddNew(selectedId, _facilityModel.FacilityGuid, _facilityModel.CountyFips);
-//            NewWellSelected = false;
-        });
+            var currentselection = _wellModel.FeatureLayer.GetSelection();
+            using (var cursor = currentselection.Search()) {
+                var hasrow = cursor.MoveNext();
+                using (var row = cursor.Current) {
+                    selectedId = Convert.ToInt64(row["OBJECTID"]);
+                }
+            }
 
+            var facility = UicWorkflowModule.GetFacilityModel();
+
+            _wellModel.AddNew(selectedId, facility.FacilityGuid, facility.CountyFips);
+            NewWellSelected = false;
+        });
 
         private async void OnSelectionChanged(MapSelectionChangedEventArgs mse) {
             foreach (var kvp in mse.Selection) {
@@ -128,14 +126,14 @@ namespace UIC_Edit_Workflow.Views {
         /// </summary>
         internal static void Show() {
             var pane = FrameworkApplication.DockPaneManager.Find(DockPaneId);
-
             pane?.Activate();
         }
 
         private void AddNewInspection() {
-//            var wellGuid = _wellModel.WellGuid;
-//
-//            _inspectionModel.AddNew(wellGuid);
+            var inspectionModel = UicWorkflowModule.GetWellInspectionModel();
+            var wellGuid = _wellModel.WellGuid;
+
+            inspectionModel.AddNew(wellGuid);
         }
     }
 }
