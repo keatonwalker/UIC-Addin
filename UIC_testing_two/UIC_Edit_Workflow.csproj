@@ -138,7 +138,6 @@
     </Compile>
     <Compile Include="Views\WellAttributeEditorViewModel.cs" />
     <Compile Include="Models\WellModel.cs" />
-    <Compile Include="WorkFlowBehaviors.cs" />
     <Compile Include="WorkFlowPane.xaml.cs">
       <DependentUpon>WorkFlowPane.xaml</DependentUpon>
     </Compile>
