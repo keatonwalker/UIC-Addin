@@ -12,9 +12,9 @@ namespace UIC_Edit_Workflow.Views {
 
         private RelayCommand _addNewInspection;
 
-        public FacilityModel FacilityModel {
+        public FacilityModel Model {
             get => _facilityModel;
-            set => SetProperty(ref _facilityModel, value, () => FacilityModel);
+            set => SetProperty(ref _facilityModel, value, () => Model);
         }
 
         /// <summary>

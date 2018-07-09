@@ -14,7 +14,6 @@
           Source="pack://application:,,,/ArcGIS.Desktop.Framework;component\Themes\Default.xaml" />
       </ResourceDictionary.MergedDictionaries>
 
-      <BooleanToVisibilityConverter x:Key="boolToVis" />
       <Style TargetType="TextBox">
         <Style.Triggers>
           <Trigger Property="Validation.HasError"
@@ -71,56 +70,55 @@
                  Text="CountyFIPS" />
       <TextBox Grid.Row="1" Grid.Column="1"
                Height="20" HorizontalAlignment="Stretch" Margin="5"
-               Text="{Binding FacilityModel.CountyFips, ValidatesOnDataErrors=True}" />
+               Text="{Binding Model.CountyFips, ValidatesOnDataErrors=True}" />
       <TextBlock Grid.Row="2" Grid.Column="0"
                  HorizontalAlignment="Right" Margin="5"
                  Text="NaicsPrimary" />
       <TextBox Grid.Row="2" Grid.Column="1"
                Height="20" HorizontalAlignment="Stretch" Margin="5"
-               Text="{Binding FacilityModel.NaicsPrimary, ValidatesOnDataErrors=True}" />
-      <!--Visibility="{Binding Source={x:Static ui:FacilityModel.Instance}, Path=EditReady, Converter={StaticResource boolToVis}}"/>-->
+               Text="{Binding Model.NaicsPrimary, ValidatesOnDataErrors=True}" />
       <TextBlock Grid.Row="3" Grid.Column="0"
                  HorizontalAlignment="Right" Margin="5"
                  Text="FacilityName" />
       <TextBox Grid.Row="3" Grid.Column="1"
                Height="20" HorizontalAlignment="Stretch" Margin="5"
-               Text="{Binding FacilityModel.FacilityName, ValidatesOnDataErrors=True}" />
+               Text="{Binding Model.FacilityName, ValidatesOnDataErrors=True}" />
       <TextBlock Grid.Row="4" Grid.Column="0"
                  HorizontalAlignment="Right" Margin="5"
                  Text="FacilityAddress" />
       <TextBox Grid.Row="4" Grid.Column="1"
                Height="20" HorizontalAlignment="Stretch" Margin="5"
-               Text="{Binding FacilityModel.FacilityAddress, ValidatesOnDataErrors=True}" />
+               Text="{Binding Model.FacilityAddress, ValidatesOnDataErrors=True}" />
       <TextBlock Grid.Row="5" Grid.Column="0"
                  HorizontalAlignment="Right" Margin="5"
                  Text="FacilityCity" />
       <TextBox Grid.Row="5" Grid.Column="1"
                Height="20" HorizontalAlignment="Stretch" Margin="5"
-               Text="{Binding FacilityModel.FacilityCity, ValidatesOnDataErrors=True}" />
+               Text="{Binding Model.FacilityCity, ValidatesOnDataErrors=True}" />
       <TextBlock Grid.Row="6" Grid.Column="0"
                  HorizontalAlignment="Right" Margin="5"
                  Text="FacilityState" />
       <TextBox Grid.Row="6" Grid.Column="1"
                Height="20" HorizontalAlignment="Stretch" Margin="5"
-               Text="{Binding FacilityModel.FacilityState, ValidatesOnDataErrors=True}" />
+               Text="{Binding Model.FacilityState, ValidatesOnDataErrors=True}" />
       <TextBlock Grid.Row="7" Grid.Column="0"
                  HorizontalAlignment="Right" Margin="5"
                  Text="FacilityZip" />
       <TextBox Grid.Row="7" Grid.Column="1"
                Height="20" HorizontalAlignment="Stretch" Margin="5"
-               Text="{Binding FacilityModel.FacilityZip, ValidatesOnDataErrors=True}" />
+               Text="{Binding Model.FacilityZip, ValidatesOnDataErrors=True}" />
       <TextBlock Grid.Row="8" Grid.Column="0"
                  HorizontalAlignment="Right" Margin="5"
                  Text="FacilityMilepost" />
       <TextBox Grid.Row="8" Grid.Column="1"
                Height="20" HorizontalAlignment="Stretch" Margin="5"
-               Text="{Binding FacilityModel.FacilityMilepost, ValidatesOnDataErrors=True}" />
+               Text="{Binding Model.FacilityMilepost, ValidatesOnDataErrors=True}" />
       <TextBlock Grid.Row="9" Grid.Column="0"
                  HorizontalAlignment="Right" Margin="5"
                  Text="Comments" />
       <TextBox Grid.Row="9" Grid.Column="1"
                Height="20" HorizontalAlignment="Stretch" Margin="5"
-               Text="{Binding FacilityModel.Comments, ValidatesOnDataErrors=True}" />
+               Text="{Binding Model.Comments, ValidatesOnDataErrors=True}" />
     </Grid>
     <GridSplitter HorizontalAlignment="Stretch"
                   VerticalAlignment="Stretch"
@@ -151,7 +149,7 @@
 
       <DockPanel Grid.Row="0" Grid.ColumnSpan="2" LastChildFill="true" KeyboardNavigation.TabNavigation="Local"
                  Height="30">
-        <TextBlock Grid.Column="1" Text="Facility Inspections" VerticalAlignment="Center" HorizontalAlignment="Center"
+        <TextBlock Text="Facility Inspections" VerticalAlignment="Center" HorizontalAlignment="Center"
                    FontSize="16" FontWeight="Light">
           <TextBlock.ToolTip>
             <WrapPanel Orientation="Vertical" MaxWidth="300">
@@ -162,26 +160,26 @@
       </DockPanel>
       <ComboBox Grid.Row="1" Grid.Column="1" SelectedItem="{Binding SelectedInspectionId, Mode=TwoWay}" Margin="5"
                 ItemsSource="{Binding InspectionIds, Mode=OneWay}" />
-      <Button Grid.Row="1" Content="Add New Inspection" Command="{Binding AddInspectionRecord}" />
-      <TextBlock Grid.Row="2"
+      <Button Grid.Row="1" Grid.Column="0" Content="Add New Inspection" Command="{Binding AddInspectionRecord}" />
+      <TextBlock Grid.Row="2" Grid.Column="0"
                  HorizontalAlignment="Right" Margin="5"
                  Text="Inspector" />
       <TextBox Grid.Row="2" Grid.Column="1"
                Height="20" HorizontalAlignment="Stretch" Margin="5"
                Text="{Binding Inspector, ValidatesOnDataErrors=True}" />
-      <TextBlock Grid.Row="3"
+      <TextBlock Grid.Row="3" Grid.Column="0"
                  HorizontalAlignment="Right" Margin="5"
                  Text="Inspection Type" />
       <TextBox Grid.Row="3" Grid.Column="1"
                Height="20" HorizontalAlignment="Stretch" Margin="5"
                Text="{Binding InspectionType, ValidatesOnDataErrors=True}" />
-      <TextBlock Grid.Row="4"
+      <TextBlock Grid.Row="4" Grid.Column="0"
                  HorizontalAlignment="Right" Margin="5"
                  Text="Inspection Date" />
       <TextBox Grid.Row="4" Grid.Column="1"
                Height="20" HorizontalAlignment="Stretch" Margin="5"
                Text="{Binding InspectionDate, ValidatesOnDataErrors=True}" />
-      <TextBlock Grid.Row="5"
+      <TextBlock Grid.Row="5" Grid.Column="0"
                  HorizontalAlignment="Right" Margin="5"
                  Text="Comment" />
       <TextBox Grid.Row="5" Grid.Column="1"

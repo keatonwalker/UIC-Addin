@@ -83,15 +83,15 @@ namespace UIC_Edit_Workflow
                             }
 
                             if (pane is FacilityAttributeEditorViewModel facility) {
-                                facility.FacilityModel = UicWorkflowModule.GetFacilityModel();
+                                facility.Model = UicWorkflowModule.GetFacilityModel();
                             }
 
                             if (pane is WellAttributeEditorViewModel well) {
-                                well.WellModel = UicWorkflowModule.GetWellModel();
+                                well.Model = UicWorkflowModule.GetWellModel();
                             }
 
                             if (pane is AuthAttributeEditorViewModel auth) {
-                                auth.AuthModel = UicWorkflowModule.GetAuthorizationModel();
+                                auth.Model = UicWorkflowModule.GetAuthorizationModel();
                             }
 
                             pane.Activate();

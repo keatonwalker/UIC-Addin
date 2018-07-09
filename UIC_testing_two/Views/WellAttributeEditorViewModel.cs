@@ -35,9 +35,9 @@ namespace UIC_Edit_Workflow.Views {
             MapSelectionChangedEvent.Subscribe(OnSelectionChanged);
         }
 
-        public WellModel WellModel {
+        public WellModel Model {
             get => _wellModel;
-            set => SetProperty(ref _wellModel, value, () => WellModel);
+            set => SetProperty(ref _wellModel, value, () => Model);
         }
 
         public bool NewWellSelected {

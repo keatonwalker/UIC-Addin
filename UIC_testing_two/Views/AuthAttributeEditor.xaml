@@ -46,44 +46,44 @@
       <ColumnDefinition Width="2*" />
     </Grid.ColumnDefinitions>
 
-    <ComboBox Grid.Row="0" Grid.Column="1" SelectedItem="{Binding AuthModel.SelectedAuthId, Mode=TwoWay}" Margin="5"
-              ItemsSource="{Binding AuthModel.AuthIds, Mode=OneWay}" />
+    <ComboBox Grid.Row="0" Grid.Column="1" SelectedItem="{Binding Model.SelectedAuthId, Mode=TwoWay}" Margin="5"
+              ItemsSource="{Binding Model.AuthIds, Mode=OneWay}" />
     <Button Grid.Row="0" Grid.Column="0" Content="Add New Authorization" Command="{Binding AddRecord}" />
     <TextBlock Grid.Row="1" Grid.Column="0"
                HorizontalAlignment="Right" Margin="5"
                Text="Auth ID" />
     <TextBox Grid.Row="1" Grid.Column="1"
              Height="20" HorizontalAlignment="Stretch" Margin="5"
-             Text="{Binding AuthModel.AuthId, ValidatesOnDataErrors=True}" />
+             Text="{Binding Model.AuthId, ValidatesOnDataErrors=True}" />
     <TextBlock Grid.Row="2" Grid.Column="0"
                HorizontalAlignment="Right" Margin="5"
                Text="Auth Type" />
     <TextBox Grid.Row="2" Grid.Column="1"
              Height="20" HorizontalAlignment="Stretch" Margin="5"
-             Text="{Binding AuthModel.AuthType, ValidatesOnDataErrors=True}" />
+             Text="{Binding Model.AuthType, ValidatesOnDataErrors=True}" />
     <TextBlock Grid.Row="3" Grid.Column="0"
                HorizontalAlignment="Right" Margin="5"
                Text="Owner Sector Type" />
     <TextBox Grid.Row="3" Grid.Column="1"
              Height="20" HorizontalAlignment="Stretch" Margin="5"
-             Text="{Binding AuthModel.SectorType, ValidatesOnDataErrors=True}" />
+             Text="{Binding Model.SectorType, ValidatesOnDataErrors=True}" />
     <TextBlock Grid.Row="4" Grid.Column="0"
                HorizontalAlignment="Right" Margin="5"
                Text="Start Date" />
     <TextBox Grid.Row="4" Grid.Column="1"
              Height="20" HorizontalAlignment="Stretch" Margin="5"
-             Text="{Binding AuthModel.StartDate, ValidatesOnDataErrors=True}" />
+             Text="{Binding Model.StartDate, ValidatesOnDataErrors=True}" />
     <TextBlock Grid.Row="5" Grid.Column="0"
                HorizontalAlignment="Right" Margin="5"
                Text="Expiration Date" />
     <TextBox Grid.Row="5" Grid.Column="1"
              Height="20" HorizontalAlignment="Stretch" Margin="5"
-             Text="{Binding AuthModel.ExpirationDate, ValidatesOnDataErrors=True}" />
+             Text="{Binding Model.ExpirationDate, ValidatesOnDataErrors=True}" />
     <TextBlock Grid.Row="6" Grid.Column="0"
                HorizontalAlignment="Right" Margin="5"
                Text="Comments" />
     <TextBox Grid.Row="6" Grid.Column="1"
              Height="20" HorizontalAlignment="Stretch" Margin="5"
-             Text="{Binding AuthModel.Comments, ValidatesOnDataErrors=True}" />
+             Text="{Binding Model.Comments, ValidatesOnDataErrors=True}" />
   </Grid>
 </UserControl>

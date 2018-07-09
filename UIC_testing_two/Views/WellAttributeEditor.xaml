@@ -64,63 +64,63 @@
       </StackPanel>
 
       <ComboBox Grid.Row="1" Grid.Column="1" Margin="5"
-                SelectedItem="{Binding WellModel.SelectedWellId, Mode=TwoWay}"
-                ItemsSource="{Binding WellModel.WellIds, Mode=OneWay}"/>
+                SelectedItem="{Binding Model.SelectedWellId, Mode=TwoWay}"
+                ItemsSource="{Binding Model.WellIds, Mode=OneWay}"/>
 
       <TextBlock Grid.Row="2" Grid.Column="0"
                  HorizontalAlignment="Right" Margin="5"
                  Text="WellId" />
       <TextBox Grid.Row="2" Grid.Column="1"
                Height="20" HorizontalAlignment="Stretch" Margin="5" 
-               Text="{Binding WellModel.WellId, ValidatesOnDataErrors=True}"/>
+               Text="{Binding Model.WellId, ValidatesOnDataErrors=True}"/>
       <TextBlock Grid.Row="3" Grid.Column="0"
                  HorizontalAlignment="Right" Margin="5"
                  Text="WellName" />
       <TextBox Grid.Row="3" Grid.Column="1"
                Height="20" HorizontalAlignment="Stretch" Margin="5" 
-               Text="{Binding WellModel.WellName, ValidatesOnDataErrors=True}"/>
+               Text="{Binding Model.WellName, ValidatesOnDataErrors=True}"/>
       <TextBlock Grid.Row="4" Grid.Column="0"
                  HorizontalAlignment="Right" Margin="5"
                  Text="WellClass" />
       <TextBox Grid.Row="4" Grid.Column="1"
                Height="20" HorizontalAlignment="Stretch" Margin="5" 
-               Text="{Binding WellModel.WellClass, ValidatesOnDataErrors=True}"/>
+               Text="{Binding Model.WellClass, ValidatesOnDataErrors=True}"/>
       <TextBlock Grid.Row="5" Grid.Column="0"
                  HorizontalAlignment="Right" Margin="5"
                  Text="WellSubClass" />
       <TextBox Grid.Row="5" Grid.Column="1"
                Height="20" HorizontalAlignment="Stretch" Margin="5" 
-               Text="{Binding WellModel.WellSubClass, ValidatesOnDataErrors=True}"/>
+               Text="{Binding Model.WellSubClass, ValidatesOnDataErrors=True}"/>
       <TextBlock Grid.Row="6" Grid.Column="0"
                  HorizontalAlignment="Right" Margin="5"
                  Text="HighPriority" />
       <TextBox Grid.Row="6" Grid.Column="1"
                Height="20" HorizontalAlignment="Stretch" Margin="5" 
-               Text="{Binding WellModel.HighPriority, ValidatesOnDataErrors=True}"/>
+               Text="{Binding Model.HighPriority, ValidatesOnDataErrors=True}"/>
       <TextBlock Grid.Row="7" Grid.Column="0"
                  HorizontalAlignment="Right" Margin="5"
                  Text="WellSWPZ" />
       <TextBox Grid.Row="7" Grid.Column="1"
                Height="20" HorizontalAlignment="Stretch" Margin="5" 
-               Text="{Binding WellModel.WellSWPZ, ValidatesOnDataErrors=True}"/>
+               Text="{Binding Model.WellSWPZ, ValidatesOnDataErrors=True}"/>
       <TextBlock Grid.Row="8" Grid.Column="0"
                  HorizontalAlignment="Right" Margin="5"
                  Text="LocationMethod" />
       <TextBox Grid.Row="8" Grid.Column="1"
                Height="20" HorizontalAlignment="Stretch" Margin="5" 
-               Text="{Binding WellModel.LocationMethod, ValidatesOnDataErrors=True}"/>
+               Text="{Binding Model.LocationMethod, ValidatesOnDataErrors=True}"/>
       <TextBlock Grid.Row="9" Grid.Column="0"
                  HorizontalAlignment="Right" Margin="5"
                  Text="LocationAccuracy" />
       <TextBox Grid.Row="9" Grid.Column="1"
                Height="20" HorizontalAlignment="Stretch" Margin="5" 
-               Text="{Binding WellModel.LocationAccuracy, ValidatesOnDataErrors=True}"/>
+               Text="{Binding Model.LocationAccuracy, ValidatesOnDataErrors=True}"/>
       <TextBlock Grid.Row="10" Grid.Column="0"
                  HorizontalAlignment="Right" Margin="5"
                  Text="Comments" />
       <TextBox Grid.Row="10" Grid.Column="1"
                Height="20" HorizontalAlignment="Stretch" Margin="5" 
-               Text="{Binding WellModel.Comments, ValidatesOnDataErrors=True}"/>
+               Text="{Binding Model.Comments, ValidatesOnDataErrors=True}"/>
 
     </Grid>
     <GridSplitter HorizontalAlignment="Stretch"

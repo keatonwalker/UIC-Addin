@@ -24,9 +24,9 @@ namespace UIC_Edit_Workflow.Views {
             set => SetProperty(ref _heading, value, () => Heading);
         }
 
-        public AuthorizationModel AuthModel {
+        public AuthorizationModel Model {
             get => _attributeEditorViewModel;
-            set => SetProperty(ref _attributeEditorViewModel, value, () => AuthModel);
+            set => SetProperty(ref _attributeEditorViewModel, value, () => Model);
         }
 
         public ICommand AddRecord {
